@@ -1,47 +1,36 @@
 # Dental Clinic Management System
 
-A full-stack web application developed for a dental clinic to streamline appointment scheduling, patient management, and service administration.
+A full-stack web application developed for a real dental clinic to streamline appointment scheduling, patient management, and service administration.  
+**Two frontend implementations** (React and Vue) share the same Spring Boot backend.
 
 ## Features
-
-* Online appointment booking and rescheduling
-* Doctor appointment management and confirmation workflow
-* Patient and doctor authentication with JWT security
-* Service catalog management
-* Doctor reviews and rating system
-* Email and SMS notifications
-* Password recovery and account verification
-* Available time slot calculation based on working hours
-* Responsive user interface for patients and staff
+- Online appointment booking, rescheduling, and cancellation (24h deadline)
+- Real‑time available time slot calculation based on doctor's working hours, breaks, and service duration  
+- **Alternative date suggestion** – when a slot is full, system offers next free days
+- Doctor confirmation workflow – appointments are pending until approved
+- Patient and doctor authentication with JWT + refresh tokens
+- Email & SMS notifications for booking, confirmation, cancellation, and reminders
+- Password recovery via email or phone (verification code)
+- Service catalog with specialization matching (doctor must have required specialty)
+- Doctor reviews and rating system (only after confirmed appointments)
+- Responsive UI for both patients and staff (React and Vue versions)
 
 ## Tech Stack
+**Backend**  
+Java · Spring Boot 3 · Spring Security · JWT · JPA/Hibernate · MySQL · JUnit 5 · MockMvc · JavaMailSender · Twilio API
 
-### Backend
-
-* Java
-* Spring Boot
-* Spring Security
-* JPA / Hibernate
-* MySQL
-* JUnit Integration Testing
-
-### Frontend
-
-* React
-* Vue.js
-* JavaScript
-* HTML5
-* CSS3
+**Frontend**  
+React · Vue.js · JavaScript · HTML5 · CSS3 · Axios
 
 ## Testing
+The project includes **20+ integration tests** covering:
+- Authentication (register, verify, login, password reset, refresh token)
+- Appointment scheduling, rescheduling, cancellation (patient & doctor roles)
+- Availability calculation and alternative dates logic
+- Review creation and average rating
+- Doctor/patient profile access
+- Public API endpoints
 
-The project includes comprehensive backend integration tests covering:
+All tests use `@Transactional` rollback, so no data is persisted.
 
-* Authentication and authorization flows
-* Appointment scheduling and cancellation
-* Doctor and patient functionalities
-* Reviews and ratings
-* Public API endpoints
-* Business logic validation
-
-This project was developed as a real-world solution for a dental clinic, focusing on usability, security, and maintainable architecture.
+This project was developed as a real‑world solution for a dental clinic, focusing on clean architecture, security, and maintainable code.
