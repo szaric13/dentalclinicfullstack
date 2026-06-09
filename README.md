@@ -1,36 +1,73 @@
-# Dental Clinic Management System
+# Dental Clinic – Full-Stack Web Application
 
-A full-stack web application developed for a real dental clinic to streamline appointment scheduling, patient management, and service administration.  
-**Two frontend implementations** (React and Vue) share the same Spring Boot backend.
-
-## Features
-- Online appointment booking, rescheduling, and cancellation (24h deadline)
-- Real‑time available time slot calculation based on doctor's working hours, breaks, and service duration  
-- **Alternative date suggestion** – when a slot is full, system offers next free days
-- Doctor confirmation workflow – appointments are pending until approved
-- Patient and doctor authentication with JWT + refresh tokens
-- Email & SMS notifications for booking, confirmation, cancellation, and reminders
-- Password recovery via email or phone (verification code)
-- Service catalog with specialization matching (doctor must have required specialty)
-- Doctor reviews and rating system (only after confirmed appointments)
-- Responsive UI for both patients and staff (React and Vue versions)
+A complete web application for a dental clinic that allows patients to book appointments online, doctors to manage their schedules, and administrators to control doctors and services.
 
 ## Tech Stack
-**Backend**  
-Java · Spring Boot 3 · Spring Security · JWT · JPA/Hibernate · MySQL · JUnit 5 · MockMvc · JavaMailSender · Twilio API
 
-**Frontend**  
-React · Vue.js · JavaScript · HTML5 · CSS3 · Axios
+### Backend
+- **Java 21** + **Spring Boot 4.0.6**
+- **Spring Security** + **JWT** (two separate authentication chains – patients and doctors)
+- **Spring Data JPA / Hibernate** + **MySQL**
+- **JavaMailSender** + **Thymeleaf** for email notifications
+- **Twilio** for SMS verification and alerts
+- **JUnit 5 + MockMvc + TestRestTemplate** (27 tests)
 
-## Testing
-The project includes **20+ integration tests** covering:
-- Authentication (register, verify, login, password reset, refresh token)
-- Appointment scheduling, rescheduling, cancellation (patient & doctor roles)
-- Availability calculation and alternative dates logic
-- Review creation and average rating
-- Doctor/patient profile access
-- Public API endpoints
+### Frontend
+- **React 19** + **Vite**
+- **React Router v6**, **Axios**
+- **React Big Calendar** for interactive appointment display
+- Custom CSS (no libraries) with a theme inspired by a real dental clinic
 
-All tests use `@Transactional` rollback, so no data is persisted.
+## Features
 
-This project was developed as a real‑world solution for a dental clinic, focusing on clean architecture, security, and maintainable code.
+### Patient
+- Registration with SMS verification
+- Login via phone number
+- View available slots in a calendar (green = free, red = taken)
+- Book, cancel and reschedule appointments
+- Rate doctors (1–5 stars)
+- Password reset (email or SMS)
+
+### Doctor
+- Login via email
+- View own calendar with all appointments
+- Confirm and cancel appointments (with patient notifications)
+- View own reviews and average rating
+- Set working hours with restrictions
+
+### Admin
+- Add and remove doctors
+- Edit doctor specializations
+- Manage holidays
+- View statistics (appointment count, revenue)
+
+### Common
+- JWT authentication with refresh tokens
+- Email & SMS notifications on booking, confirmation and cancellation
+- Cancellation deadline (at least 24h in advance)
+- Doctor–service specialization compatibility check
+- Alternative dates when no slots are available
+
+## How to Run Locally
+
+### Backend
+1. Clone the repo
+2. Start MySQL and create the `dental_clinic` database
+3. Run `DentalClinicApplication.java`
+4. Backend runs at `http://localhost:8080`
+
+### Frontend
+1. `cd dental-frontend`
+2. `npm install`
+3. `npm run dev`
+4. Frontend runs at `http://localhost:5173`
+
+## Tests
+- 27 automated tests (JUnit + MockMvc)
+- Cover authentication, appointment CRUD, cancellation, reviews, public endpoints
+
+## Screenshots
+*(Insert screenshots of the application here)*
+
+## License
+MIT
