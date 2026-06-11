@@ -69,5 +69,47 @@ A complete web application for a dental clinic that allows patients to book appo
 ## Screenshots
 *(Insert screenshots of the application here)*
 
+## Izmene
+
+### BEK-END IZMENE
+- AppointmentResponse.java – dodato polje serviceId i ažuriran konstruktor sa 8 parametara.
+- PatientController.java – dodato a.getService().getId() u mapiranje za getMyAppointments.
+- DoctorController.java – dodato app.getService().getId() u createManualAppointment i getMyAppointments.
+- AppointmentController.java – dodato app.getService().getId() u bookAppointment.
+- AppointmentService.java – dodata metoda autoCompletePastAppointments() sa @Scheduled za automatsko poništavanje prošlih termina.
+- AppointmentRepository.java – dodata metoda findByStatusAndEndDateTimeBefore.
+- DentalClinicApplication.java – dodata anotacija @EnableScheduling.
+- SecurityConfig.java – dodato .requestMatchers(HttpMethod.GET, "/api/reviews/doctors/**").permitAll().
+- DoctorWorkingHoursService.java – dodata validacija za radno vreme (08:00‑19:00, subota do 12:00).
+
+### FRONT-END IZMENE
+- src/components/Navbar.jsx – dodat search bar, centriran meni, dark mode dugme, jezičko dugme, uklonjen top bar.
+- src/components/Footer.jsx – redizajniran sa tri kolone.
+- src/components/ChatWidget.jsx – potpuno nov fajl (custom chatbot).
+- src/components/PageWrapper.jsx – potpuno nov fajl (framer‑motion animacije).
+- src/pages/BookAppointment.jsx – dodat modal za profil doktora, slika pored menija, popravljen kalendar.
+- src/pages/PatientDashboard.jsx – modal za otkazivanje, ispravljen reschedule, ICS download, "Vaš sledeći termin" widget.
+- src/pages/DoctorDashboard.jsx – radno vreme sa validacijom, ocene, ručno dodavanje termina, modal za otkazivanje.
+- src/pages/HomePage.jsx – FAQ sekcija, social proof, SEO Helmet.
+- src/pages/SpecialtyPage.jsx – potpuno nov fajl (leva kolona + opis).
+- src/pages/ProfilePage.jsx – potpuno nov fajl (za sestre i fallback za doktore).
+- src/pages/DoctorProfilePage.jsx – popravljene ocene (javno vidljive), slike, SEO.
+- src/pages/ContactPage.jsx – Google Maps iframe, SEO.
+- src/pages/ServicesPage.jsx – grupisanje po specijalizaciji, SEO.
+- src/pages/ServiceDetailPage.jsx – SEO.
+- src/pages/TeamPage.jsx – SEO.
+- src/pages/BlogPage.jsx – SEO.
+- src/pages/LoginPage.jsx – toast notifikacije, SEO.
+- src/pages/RegisterPage.jsx – toast notifikacije, SEO.
+- src/pages/ForgotPasswordPage.jsx – toast notifikacije, SEO.
+- src/pages/ResetPasswordPage.jsx – toast notifikacije, SEO.
+- src/pages/DoctorLoginPage.jsx – toast notifikacije, SEO.
+- src/App.jsx – dodat HelmetProvider, AnimatePresence, Toaster, CookieConsent, ChatWidget.
+- src/i18n.js – potpuno nov fajl.
+- src/index.css – potpuno redizajniran sa CSS varijablama i dark mode‑om.
+- src/main.jsx – dodat PWA service worker.
+- public/manifest.json – potpuno nov fajl.
+- public/service-worker.js – potpuno nov fajl.
+
 ## License
 MIT
