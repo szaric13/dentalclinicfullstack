@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './pages/Navbar';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Navbar from './pages/NavBar';
 import Footer from './pages/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -22,7 +22,19 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 export default function App() {
     return (
         <BrowserRouter>
-            <Navbar />
+            <AppShell />
+        </BrowserRouter>
+    );
+}
+
+function AppShell() {
+    const { pathname } = useLocation();
+    // The doctor dashboard is a full-screen SaaS layout with its own chrome.
+    const isDashboard = pathname.startsWith('/doctor/dashboard');
+
+    return (
+        <>
+            {!isDashboard && <Navbar />}
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -43,7 +55,7 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="/profile/:slug" element={<ProfilePage />} />
             </Routes>
-            <Footer />
-        </BrowserRouter>
+            {!isDashboard && <Footer />}
+        </>
     );
 }
