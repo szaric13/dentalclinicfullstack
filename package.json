@@ -1,0 +1,13 @@
+{
+  "name": "dental-clinic-fullstack",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Root proxy that runs the Vite React frontend located in dentafront/dental-frontend.",
+  "scripts": {
+    "postinstall": "npm install --prefix dentafront/dental-frontend",
+    "dev": "npm run dev --prefix dentafront/dental-frontend",
+    "build": "npm run build --prefix dentafront/dental-frontend",
+    "preview": "npm run preview --prefix dentafront/dental-frontend",
+    "lint": "npm run lint --prefix dentafront/dental-frontend"
+  }
+}
