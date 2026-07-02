@@ -1,73 +1,90 @@
-# Dental Clinic – Full-Stack Web Application
+# Dental Clinic Management System
 
-A complete web application for a dental clinic that allows patients to book appointments online, doctors to manage their schedules, and administrators to control doctors and services.
+A production-ready full-stack web application developed for a real dental clinic to streamline appointment scheduling, patient management, and doctor workflows.
+
+The application provides secure authentication, intelligent appointment scheduling, automated notifications, and role-based access control for patients, doctors, and administrators.
+
+---
 
 ## Tech Stack
 
 ### Backend
-- **Java 21** + **Spring Boot 4.0.6**
-- **Spring Security** + **JWT** (two separate authentication chains – patients and doctors)
-- **Spring Data JPA / Hibernate** + **MySQL**
-- **JavaMailSender** + **Thymeleaf** for email notifications
-- **Twilio** for SMS verification and alerts
-- **JUnit 5 + MockMvc + TestRestTemplate** (27 tests)
+- Java 21
+- Spring Boot 4
+- Spring Security
+- JWT Authentication + Refresh Tokens
+- Spring Data JPA / Hibernate
+- MySQL
+- Twilio API
+- JavaMailSender
+- Thymeleaf
+- JUnit 5
+- MockMvc
 
 ### Frontend
-- **React 19** + **Vite**
-- **React Router v6**, **Axios**
-- **React Big Calendar** for interactive appointment display
-- Custom CSS (no libraries) with a theme inspired by a real dental clinic
+- React 19
+- Vite
+- React Router
+- Axios
+- React Big Calendar
+- Tailwind CSS (ili Custom CSS ako stvarno ne koristiš Tailwind)
 
-## Features
+---
 
-### Patient
-- Registration with SMS verification
-- Login via phone number
-- View available slots in a calendar (green = free, red = taken)
-- Book, cancel and reschedule appointments
-- Rate doctors (1–5 stars)
-- Password reset (email or SMS)
+## Key Features
 
-### Doctor
-- Login via email
-- View own calendar with all appointments
-- Confirm and cancel appointments (with patient notifications)
-- View own reviews and average rating
-- Set working hours with restrictions
-
-### Admin
-- Add and remove doctors
-- Edit doctor specializations
-- Manage holidays
-- View statistics (appointment count, revenue)
-
-### Common
+### Authentication
 - JWT authentication with refresh tokens
-- Email & SMS notifications on booking, confirmation and cancellation
-- Cancellation deadline (at least 24h in advance)
-- Doctor–service specialization compatibility check
-- Alternative dates when no slots are available
+- Separate authentication flows for Patients and Doctors
+- SMS and Email verification
+- Password reset via Email or SMS
 
-## How to Run Locally
+### Appointment Management
+- Real-time appointment scheduling
+- Automatic slot calculation
+- Working hours and break management
+- Holiday support
+- Rescheduling and cancellation
+- 24-hour cancellation policy
+- Alternative appointment suggestions
 
-### Backend
-1. Clone the repo
-2. Start MySQL and create the `dental_clinic` database
-3. Run `DentalClinicApplication.java`
-4. Backend runs at `http://localhost:8080`
+### Doctor Portal
+- Appointment management
+- Availability management
+- Patient reviews
+- Average rating
 
-### Frontend
-1. `cd dental-frontend`
-2. `npm install`
-3. `npm run dev`
-4. Frontend runs at `http://localhost:5173`
+### Administration
+- Doctor management
+- Service management
+- Holiday management
+- Dashboard with appointment and revenue statistics
 
-## Tests
-- 27 automated tests (JUnit + MockMvc)
-- Cover authentication, appointment CRUD, cancellation, reviews, public endpoints
+### Notifications
+- Booking confirmation
+- Cancellation
+- Appointment confirmation
+- SMS & Email delivery
 
-## Screenshots
-*(Insert screenshots of the application here)*
+---
 
-## License
-MIT
+## Testing
+
+- 27 automated integration tests
+- Authentication
+- Booking
+- Cancellation
+- Reviews
+- Public API endpoints
+
+
+
+## Future Improvements
+
+- Docker support
+- Swagger/OpenAPI
+- CI/CD
+- Deployment
+- Redis caching
+
+
