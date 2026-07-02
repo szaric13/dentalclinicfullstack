@@ -79,7 +79,6 @@ class DentalClinicApplicationTests {
 		SecurityContextHolder.clearContext();
 	}
 
-	// ==================== AUTH TESTS ====================
 
 	@Test
 	void testRegisterPatient() throws Exception {
@@ -224,7 +223,6 @@ class DentalClinicApplicationTests {
 				.andExpect(status().isBadRequest());
 	}
 
-	// ==================== PACIJENT TESTS ====================
 
 	@Test
 	void testGetPatientProfile() throws Exception {
@@ -285,7 +283,6 @@ class DentalClinicApplicationTests {
 		clearSecurityContext();
 	}
 
-	// ==================== DOCTOR TESTS ====================
 
 	@Test
 	void testGetDoctorProfile() throws Exception {
@@ -343,7 +340,6 @@ class DentalClinicApplicationTests {
 		clearSecurityContext();
 	}
 
-	// ==================== APPOINTMENT TESTS ====================
 
 	@Test
 	void testGetAvailableSlots() throws Exception {
@@ -406,7 +402,7 @@ class DentalClinicApplicationTests {
 		clearSecurityContext();
 	}
 
-	// ==================== PUBLIC TESTS ====================
+
 
 	@Test
 	void testGetPublicDoctors() throws Exception {
@@ -426,7 +422,7 @@ class DentalClinicApplicationTests {
 				.andExpect(jsonPath("$", hasSize(1)));
 	}
 
-	// ==================== REVIEW TESTS ====================
+
 
 	@Test
 	void testAddReview() throws Exception {
@@ -464,7 +460,7 @@ class DentalClinicApplicationTests {
 				.andExpect(status().isOk());
 	}
 
-	// ==================== POMOĆNE METODE ====================
+
 
 	private Patient savePatient(String phone, String password, boolean active, boolean verified) {
 		Patient p = Patient.builder()
@@ -514,5 +510,68 @@ class DentalClinicApplicationTests {
 				.startDateTime(start).endDateTime(start.plusMinutes(s.getDurationMinutes()))
 				.status(Appointment.AppointmentStatus.SCHEDULED).build();
 		return appointmentRepository.save(a);
+	}
+	@Test
+	void testManualAppointmentByDoctor() throws Exception {
+		Doctor d = saveDoctor("manual@test.com", "doktor123", "Opšta");
+		DentalService s = saveService("Pregled", 30, "Opšta");
+		saveWorkingHours(d, 1, LocalTime.of(8, 0), LocalTime.of(16, 0));
+		setSecurityContext(d.getId(), "DOCTOR");
+
+		LocalDate monday = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
+		LocalDateTime start = LocalDateTime.of(monday, LocalTime.of(9, 0));
+
+		ManualAppointmentRequest req = new ManualAppointmentRequest();
+		req.setServiceId(s.getId());
+		req.setStartDateTime(start);
+		req.setPatientPhone("0601234567");
+		req.setPatientFirstName("Petar");
+		req.setPatientLastName("Petrović");
+		req.setPatientNotes("Hitno");
+
+		mockMvc.perform(post("/api/doctor/appointments/manual")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(req)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").value("CONFIRMED"))
+				.andExpect(jsonPath("$.doctorName").value("Petar Petrović"));
+
+		clearSecurityContext();
+	}
+	@Test
+	void testUpdateWorkingHours() throws Exception {
+		Doctor d = saveDoctor("hours@test.com", "doktor123", "Opšta");
+		setSecurityContext(d.getId(), "DOCTOR");
+
+		DoctorWorkingHoursRequest req = new DoctorWorkingHoursRequest();
+		req.setDoctorId(d.getId());
+		req.setDayOfWeek(1);
+		req.setStartTime(LocalTime.of(9, 0));
+		req.setEndTime(LocalTime.of(17, 0));
+
+		mockMvc.perform(put("/api/doctor/working-hours")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(req)))
+				.andExpect(status().isOk());
+
+		clearSecurityContext();
+	}
+	@Test
+	void testUpdateWorkingHoursInvalidStart() throws Exception {
+		Doctor d = saveDoctor("hours2@test.com", "doktor123", "Opšta");
+		setSecurityContext(d.getId(), "DOCTOR");
+
+		DoctorWorkingHoursRequest req = new DoctorWorkingHoursRequest();
+		req.setDoctorId(d.getId());
+		req.setDayOfWeek(1);
+		req.setStartTime(LocalTime.of(7, 0));
+		req.setEndTime(LocalTime.of(17, 0));
+
+		mockMvc.perform(put("/api/doctor/working-hours")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(req)))
+				.andExpect(status().isBadRequest());
+
+		clearSecurityContext();
 	}
 }

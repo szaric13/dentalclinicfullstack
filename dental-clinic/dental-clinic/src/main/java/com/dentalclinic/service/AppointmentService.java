@@ -1,8 +1,12 @@
 package com.dentalclinic.service;
 
+import com.dentalclinic.dto.ManualAppointmentRequest;
 import com.dentalclinic.model.*;
 import com.dentalclinic.repository.AppointmentRepository;
+import com.dentalclinic.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +27,8 @@ public class AppointmentService {
     private final ServiceCatalogService serviceCatalogService;
     private final DoctorWorkingHoursService workingHoursService;
     private static final long CANCELLATION_DEADLINE_HOURS = 24;
-
+    private final PatientRepository patientRepository;
+    private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final SmsService smsService;
 
@@ -260,5 +265,84 @@ public class AppointmentService {
             checked++;
         }
         return alternatives;
+    }
+    @Scheduled(fixedRate = 3600000) // svakih sat vremena
+    @Transactional
+    public void autoCompletePastAppointments() {
+        List<Appointment> past = appointmentRepository
+                .findByStatusAndEndDateTimeBefore(Appointment.AppointmentStatus.SCHEDULED, LocalDateTime.now());
+        past.addAll(appointmentRepository
+                .findByStatusAndEndDateTimeBefore(Appointment.AppointmentStatus.CONFIRMED, LocalDateTime.now()));
+        for (Appointment a : past) {
+            a.setStatus(Appointment.AppointmentStatus.COMPLETED);
+            appointmentRepository.save(a);
+        }
+    }
+    @Transactional
+    public Appointment createManualAppointment(Long doctorId, ManualAppointmentRequest request) {
+        Doctor doctor = doctorService.getById(doctorId);
+        DentalService service = serviceCatalogService.getById(request.getServiceId());
+
+        // Pronađi ili kreiraj pacijenta
+        Patient patient = patientService.findByPhone(request.getPatientPhone())
+                .orElseGet(() -> {
+                    Patient newPatient = Patient.builder()
+                            .phone(request.getPatientPhone())
+                            .firstName(request.getPatientFirstName())
+                            .lastName(request.getPatientLastName())
+                            .email(request.getPatientPhone() + "@temp.com") // privremeni email
+                            .password(passwordEncoder.encode("temp123"))    // privremena lozinka
+                            .active(true)
+                            .verified(true)
+                            .deleted(false)
+                            .build();
+                    return patientRepository.save(newPatient);
+                });
+
+        // Provera specijalizacije
+        if (doctor.getSpecialization() == null || service.getSpecialization() == null) {
+            throw new RuntimeException("Doktor ili usluga nemaju definisanu specijalizaciju.");
+        }
+        String[] doctorSpecs = doctor.getSpecialization().split(",");
+        boolean specMatch = false;
+        for (String spec : doctorSpecs) {
+            if (spec.trim().equalsIgnoreCase(service.getSpecialization().trim())) {
+                specMatch = true;
+                break;
+            }
+        }
+        if (!specMatch) {
+            throw new RuntimeException("Doktor nema odgovarajuću specijalizaciju za ovu uslugu.");
+        }
+
+        // Provera dostupnosti slota
+        LocalDate date = request.getStartDateTime().toLocalDate();
+        List<LocalDateTime> freeSlots = getAvailableSlots(doctorId, request.getServiceId(), date);
+        if (!freeSlots.contains(request.getStartDateTime())) {
+            throw new RuntimeException("Odabrani termin je zauzet ili nije dostupan.");
+        }
+
+        // Kreiraj termin sa statusom CONFIRMED (jer je doktor lično zakazao)
+        Appointment appointment = Appointment.builder()
+                .patient(patient)
+                .doctor(doctor)
+                .service(service)
+                .startDateTime(request.getStartDateTime())
+                .endDateTime(request.getStartDateTime().plusMinutes(service.getDurationMinutes()))
+                .status(Appointment.AppointmentStatus.CONFIRMED)
+                .patientNotes(request.getPatientNotes())
+                .build();
+
+        appointment = appointmentRepository.save(appointment);
+
+        // Notifikacija pacijentu
+        String message = "Vaš termin kod dr " + doctor.getFirstName() + " " + doctor.getLastName() +
+                " je zakazan za " + appointment.getStartDateTime() + ".";
+        if (patient.getEmail() != null && !patient.getEmail().isBlank()) {
+            emailService.sendSimpleMessage(patient.getEmail(), "Termin zakazan", message);
+        }
+        smsService.sendSms(patient.getPhone(), message);
+
+        return appointment;
     }
 }

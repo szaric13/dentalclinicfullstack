@@ -50,7 +50,8 @@ public class AppointmentController {
                     app.getStartDateTime(),
                     app.getEndDateTime(),
                     app.getStatus().name(),
-                    app.getDoctor().getId()
+                    app.getDoctor().getId(),
+                    app.getService().getId()
             );
             return ResponseEntity.ok(resp);
         } catch (RuntimeException e) {

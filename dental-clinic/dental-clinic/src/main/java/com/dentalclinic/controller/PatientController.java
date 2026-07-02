@@ -44,7 +44,8 @@ public class PatientController {
                         a.getStartDateTime(),
                         a.getEndDateTime(),
                         a.getStatus().name(),
-                        a.getDoctor().getId()
+                        a.getDoctor().getId(),
+                        a.getService().getId()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);
