@@ -1,17 +1,16 @@
 # ---------- Build frontend ----------
 FROM node:20-alpine AS frontend-build
 WORKDIR /frontend
-COPY dental-clinic-app/package.json dental-clinic-app/pnpm-lock.yaml ./
-# Dozvoli ažuriranje lockfile-a jer imaš neusklađen react-big-calendar
+COPY dentafront/dental-clinic-app/package.json dentafront/dental-clinic-app/pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --no-frozen-lockfile
-COPY dental-clinic-app/ ./
+COPY dentafront/dental-clinic-app/ ./
 RUN pnpm run build
 
 # ---------- Build backend + ubaci frontend ----------
 FROM maven:3.9-eclipse-temurin-21 AS backend-build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+COPY dental-clinic/dental-clinic/pom.xml .
+COPY dental-clinic/dental-clinic/src ./src
 COPY --from=frontend-build /frontend/dist/ ./src/main/resources/static/
 RUN mvn clean package -DskipTests
 
