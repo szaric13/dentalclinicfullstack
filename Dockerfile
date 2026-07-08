@@ -4,7 +4,8 @@ WORKDIR /frontend
 COPY dentafront/dental-clinic-app/package.json dentafront/dental-clinic-app/pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --no-frozen-lockfile
 COPY dentafront/dental-clinic-app/ ./
-RUN pnpm run build
+# Važno: postavi relativni API URL tako da svi pozivi idu na isti domen
+RUN VITE_API_BASE_URL=/api pnpm run build
 
 # ---------- Build backend + ubaci frontend ----------
 FROM maven:3.9-eclipse-temurin-21 AS backend-build

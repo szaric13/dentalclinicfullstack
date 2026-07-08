@@ -1,7 +1,6 @@
 import axios from "axios"
 
-// ===== API bazni URL (isključivo iz env varijable – Render postavlja VITE_API_BASE_URL) =====
-export const API_BASE = import.meta.env.VITE_API_BASE_URL
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"
 
 export const storage = {
   get accessToken() {
@@ -30,7 +29,6 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 })
 
-// Attach access token to every request
 api.interceptors.request.use((config) => {
   const token = storage.accessToken
   if (token) {
@@ -62,8 +60,6 @@ api.interceptors.response.use(
     async (error) => {
       const original = error.config
       const status = error.response?.status
-
-      // Only attempt refresh on 403 for protected (non-auth) requests
       const isAuthEndpoint = original?.url?.includes("/auth/")
 
       if (status === 403 && !original._retry && !isAuthEndpoint) {
@@ -105,7 +101,7 @@ api.interceptors.response.use(
       }
 
       return Promise.reject(error)
-    },
+    }
 )
 
 export default api
