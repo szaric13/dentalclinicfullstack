@@ -1,6 +1,8 @@
 import axios from "axios"
 
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api"
+// ===== API bazni URL (isključivo iz env varijable – Render postavlja VITE_API_BASE_URL) =====
+export const API_BASE = import.meta.env.VITE_API_BASE_URL
+
 export const storage = {
   get accessToken() {
     return localStorage.getItem("accessToken")
@@ -56,54 +58,54 @@ function handleLogout() {
 }
 
 api.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const original = error.config
-    const status = error.response?.status
+    (res) => res,
+    async (error) => {
+      const original = error.config
+      const status = error.response?.status
 
-    // Only attempt refresh on 403 for protected (non-auth) requests
-    const isAuthEndpoint = original?.url?.includes("/auth/")
+      // Only attempt refresh on 403 for protected (non-auth) requests
+      const isAuthEndpoint = original?.url?.includes("/auth/")
 
-    if (status === 403 && !original._retry && !isAuthEndpoint) {
-      const role = (storage.role || "patient").toLowerCase()
-      const refreshToken = storage.refreshToken
+      if (status === 403 && !original._retry && !isAuthEndpoint) {
+        const role = (storage.role || "patient").toLowerCase()
+        const refreshToken = storage.refreshToken
 
-      if (!refreshToken) {
-        handleLogout()
-        return Promise.reject(error)
-      }
+        if (!refreshToken) {
+          handleLogout()
+          return Promise.reject(error)
+        }
 
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          pendingQueue.push({ resolve, reject })
-        })
-          .then((token) => {
-            original.headers.Authorization = `Bearer ${token}`
-            return api(original)
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            pendingQueue.push({ resolve, reject })
           })
-          .catch((err) => Promise.reject(err))
+              .then((token) => {
+                original.headers.Authorization = `Bearer ${token}`
+                return api(original)
+              })
+              .catch((err) => Promise.reject(err))
+        }
+
+        original._retry = true
+        isRefreshing = true
+
+        try {
+          const { data } = await axios.post(`${API_BASE}/auth/${role}/refresh`, { refreshToken })
+          storage.set({ accessToken: data.accessToken, refreshToken: data.refreshToken })
+          processQueue(null, data.accessToken)
+          original.headers.Authorization = `Bearer ${data.accessToken}`
+          return api(original)
+        } catch (refreshErr) {
+          processQueue(refreshErr, null)
+          handleLogout()
+          return Promise.reject(refreshErr)
+        } finally {
+          isRefreshing = false
+        }
       }
 
-      original._retry = true
-      isRefreshing = true
-
-      try {
-        const { data } = await axios.post(`${API_BASE}/auth/${role}/refresh`, { refreshToken })
-        storage.set({ accessToken: data.accessToken, refreshToken: data.refreshToken })
-        processQueue(null, data.accessToken)
-        original.headers.Authorization = `Bearer ${data.accessToken}`
-        return api(original)
-      } catch (refreshErr) {
-        processQueue(refreshErr, null)
-        handleLogout()
-        return Promise.reject(refreshErr)
-      } finally {
-        isRefreshing = false
-      }
-    }
-
-    return Promise.reject(error)
-  },
+      return Promise.reject(error)
+    },
 )
 
 export default api
