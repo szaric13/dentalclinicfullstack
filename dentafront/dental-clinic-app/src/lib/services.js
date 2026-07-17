@@ -5,6 +5,7 @@ export const publicApi = {
   doctors: () => api.get("/public/doctors").then((r) => r.data),
   services: () => api.get("/public/services").then((r) => r.data),
   nurses: () => api.get("/public/nurses").then((r) => r.data),
+  nurse: (id) => api.get(`/public/nurses/${id}`).then((r) => r.data),
   doctorReviews: (id) => api.get(`/reviews/doctors/${id}`).then((r) => r.data),
   doctorAverage: (id) => api.get(`/reviews/doctors/${id}/average`).then((r) => r.data),
 }

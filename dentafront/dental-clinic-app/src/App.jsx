@@ -24,64 +24,71 @@ import TeamPage from "./pages/TeamPage.jsx"
 import BlogPage from "./pages/BlogPage.jsx"
 import ProfilePage from "./pages/ProfilePage.jsx"
 import NotFoundPage from "./pages/NotFoundPage.jsx"
-import NursesPage from "./pages/NursePage.jsx";
+import NursesPage from "./pages/NursePage.jsx"                // lista svih sestara (ako želiš)
+import NurseProfilePage from "./pages/NurseProfilePage.jsx"   // ✅ NOVO – detalji sestre
 
 export default function App() {
-  const location = useLocation()
+    const location = useLocation()
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <ScrollToTop />
-      <Navbar />
-      <main className="flex-1">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/doctor" element={<DoctorLoginPage />} />
-            <Route path="/nurses" element={<NursesPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/services/specialty/:specialty" element={<SpecialtyPage />} />
-            <Route path="/services/:id" element={<ServiceDetailPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/doctor/:id" element={<DoctorProfilePage />} />
-            <Route path="/profile/:slug" element={<ProfilePage />} />
+    return (
+        <div className="flex min-h-screen flex-col">
+            <ScrollToTop />
+            <Navbar />
+            <main className="flex-1">
+                <AnimatePresence mode="wait">
+                    <Routes location={location} key={location.pathname}>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                        <Route path="/reset-password" element={<ResetPasswordPage />} />
+                        <Route path="/doctor" element={<DoctorLoginPage />} />
 
-            <Route
-              path="/patient/dashboard"
-              element={
-                <ProtectedRoute role="PATIENT">
-                  <PatientDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient/book"
-              element={
-                <ProtectedRoute role="PATIENT">
-                  <BookAppointment />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/doctor/dashboard"
-              element={
-                <ProtectedRoute role="DOCTOR">
-                  <DoctorDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </AnimatePresence>
-      </main>
-      <Footer />
-      <ChatWidget />
-    </div>
-  )
+                        {/* ✅ Ruta za listu sestara (ako je koristiš) */}
+                        <Route path="/nurses" element={<NursesPage />} />
+
+                        {/* ✅ NOVA RUTA – profil pojedinačne sestre */}
+                        <Route path="/nurse/:id" element={<NurseProfilePage />} />
+
+                        <Route path="/services" element={<ServicesPage />} />
+                        <Route path="/services/specialty/:specialty" element={<SpecialtyPage />} />
+                        <Route path="/services/:id" element={<ServiceDetailPage />} />
+                        <Route path="/team" element={<TeamPage />} />
+                        <Route path="/blog" element={<BlogPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/doctor/:id" element={<DoctorProfilePage />} />
+                        <Route path="/profile/:slug" element={<ProfilePage />} />
+
+                        <Route
+                            path="/patient/dashboard"
+                            element={
+                                <ProtectedRoute role="PATIENT">
+                                    <PatientDashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/patient/book"
+                            element={
+                                <ProtectedRoute role="PATIENT">
+                                    <BookAppointment />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/doctor/dashboard"
+                            element={
+                                <ProtectedRoute role="DOCTOR">
+                                    <DoctorDashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                </AnimatePresence>
+            </main>
+            <Footer />
+            <ChatWidget />
+        </div>
+    )
 }

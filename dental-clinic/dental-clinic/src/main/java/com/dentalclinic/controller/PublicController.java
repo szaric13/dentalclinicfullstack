@@ -9,6 +9,7 @@ import com.dentalclinic.service.ServiceCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,5 +37,10 @@ public class PublicController {
     @GetMapping("/nurses")
     public ResponseEntity<List<Nurse>> getNurses() {
         return ResponseEntity.ok(nurseService.getAllActiveNurses());
+    }
+
+    @GetMapping("/nurses/{id}")
+    public ResponseEntity<Nurse> getNurse(@PathVariable Long id) {
+        return ResponseEntity.ok(nurseService.getById(id));
     }
 }

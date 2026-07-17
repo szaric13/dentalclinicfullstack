@@ -32,4 +32,6 @@ public class NurseService {
         nurse.setActive(false);
         nurseRepository.save(nurse);
     }
+
+
 }
