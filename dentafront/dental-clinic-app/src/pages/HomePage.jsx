@@ -12,6 +12,8 @@ import {
     ArrowRight,
     Stethoscope,
     Sparkles,
+    Users,
+    Award,
 } from "lucide-react"
 import PageWrapper from "../components/PageWrapper"
 import { Button } from "../components/ui"
@@ -57,8 +59,7 @@ function Hero() {
                         </Button>
                     </Link>
                 </div>
-
-                {/* ✅ Google ocena – ZAKOMENTARISANO dok ne napravimo novi profil */}
+                {/* Google ocena ZAKOMENTARISANA */}
                 {/*
         <div className="mt-8 flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -105,11 +106,10 @@ function Hero() {
 
 function Stats() {
     const items = [
-        { icon: Stethoscope, value: "15+", label: "godina iskustva" },
-        { icon: CalendarCheck, value: "20.000+", label: "zadovoljnih pacijenata" },
-        // ✅ Google deo zakomentarisan – biće dodat kad napravimo novi profil
-        // { icon: Star, value: "4.9", label: "Google ocena" },
+        { icon: Award, value: "15+", label: "godina iskustva" },
+        { icon: Users, value: "20.000+", label: "zadovoljnih pacijenata" },
         { icon: ShieldCheck, value: "100%", label: "posvećenost kvalitetu" },
+        { icon: Sparkles, value: "Savremene", label: "tehnologije" },
     ]
     return (
         <Section className="py-6">
