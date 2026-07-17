@@ -1,19 +1,15 @@
 import { Link } from "react-router-dom"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
 import { CLINIC, SPECIALTIES } from "../lib/data"
-import { useTheme } from "../context/ThemeContext"
 
 export default function Footer() {
-  const { theme } = useTheme()
-  const logoSrc = theme === "dark" ? "/images/logonzdark.png" : "/images/logonz.png"
-
   return (
       <footer className="mt-auto border-t border-border bg-foreground text-background">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
             <div className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
               <img
-                  src={logoSrc}
+                  src="/images/logonz.png"
                   alt={CLINIC.name}
                   className="h-9 w-9 object-contain"
               />
