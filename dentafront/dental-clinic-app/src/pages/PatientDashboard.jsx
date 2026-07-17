@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext"
 import { patientApi } from "../lib/services"
 import { publicApi } from "../lib/services"
 import { formatDateTime, formatDayLabel, formatTime, apiError, hoursUntil, toLocalDateInput } from "../lib/utils"
+import { CLINIC } from "../lib/data"
 
 export default function PatientDashboard() {
     const { user, logout } = useAuth()
@@ -108,7 +109,6 @@ export default function PatientDashboard() {
         if (!app) return
         setSubmittingReview(true)
         try {
-            await patientApi.book // ne, koristimo reviewApi
             const { reviewApi } = await import("../lib/services")
             await reviewApi.create(app.doctorId, { appointmentId: reviewId, rating, comment })
             toast.success("Ocena poslata!")
@@ -129,9 +129,9 @@ export default function PatientDashboard() {
         const event = {
             start: [start.getFullYear(), start.getMonth() + 1, start.getDate(), start.getHours(), start.getMinutes()],
             duration: { minutes: Math.round((end - start) / 60000) },
-            title: `${app.serviceName} - Denta`,
+            title: `${app.serviceName} - ${CLINIC.name}`,
             description: `Stomatološki termin: ${app.serviceName}\nDoktor: ${app.doctorName}`,
-            location: "Uče Dimitrijevića 7, Požega",
+            location: CLINIC.address,
         }
         ics.createEvent(event, (err, value) => {
             if (!err) {

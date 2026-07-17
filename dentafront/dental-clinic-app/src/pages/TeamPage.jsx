@@ -13,64 +13,53 @@ const fadeUp = {
 export default function TeamPage() {
     const { doctors, loading, refetch } = useDoctors()
 
-    // Automatski osveži podatke kad se stranica fokusira
+    // Automatsko osvežavanje
     useEffect(() => {
-        const handleFocus = () => {
-            refetch()
-        }
-
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                refetch()
-            }
-        }
-
+        const handleFocus = () => refetch()
         window.addEventListener("focus", handleFocus)
-        document.addEventListener("visibilitychange", handleVisibilityChange)
-
-        return () => {
-            window.removeEventListener("focus", handleFocus)
-            document.removeEventListener("visibilitychange", handleVisibilityChange)
-        }
+        return () => window.removeEventListener("focus", handleFocus)
     }, [refetch])
 
+    // Uzmemo samo prvog doktora (dr Zarića)
+    const doctor = doctors[0]
+
     return (
-        <PageWrapper title="Naš tim" description="Upoznajte naše stomatologe i stručni tim.">
+        <PageWrapper title="Doktor Nenad Zarić" description="Stomatološka ordinacija dr Nenad Zarić – specijalista protetike.">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="mb-10 text-center">
-                    <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Naš tim</h1>
-                    <p className="mt-3 text-muted-foreground">Stručnjaci kojima verujete svoj osmeh.</p>
+                    <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Dr Nenad Zarić</h1>
+                    <p className="mt-3 text-muted-foreground">Specijalista protetike i implantologije</p>
                 </div>
 
                 {loading ? (
                     <div className="flex justify-center py-20 text-muted-foreground">Učitavanje…</div>
-                ) : doctors.length === 0 ? (
+                ) : !doctor ? (
                     <div className="rounded-2xl border border-border bg-card p-10 text-center text-muted-foreground">
-                        Trenutno nema doktora u bazi.
+                        Podaci o doktoru nisu dostupni.
                     </div>
                 ) : (
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        {doctors.map((d, i) => (
-                            <motion.div
-                                key={d.id}
-                                custom={i}
-                                initial="hidden"
-                                whileInView="show"
-                                viewport={{ once: true, margin: "-60px" }}
-                                variants={fadeUp}
+                    <div className="mx-auto max-w-md">
+                        <motion.div
+                            custom={0}
+                            initial="hidden"
+                            whileInView="show"
+                            viewport={{ once: true, margin: "-60px" }}
+                            variants={fadeUp}
+                        >
+                            <Link
+                                to={`/doctor/${doctor.id}`}
+                                className="group flex flex-col items-center rounded-2xl border border-border bg-card p-8 text-center transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg"
                             >
-                                <Link
-                                    to={`/doctor/${d.id}`}
-                                    className="group flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg"
-                                >
-                                    <Avatar name={`${d.firstName} ${d.lastName}`} size={96} />
-                                    <h3 className="mt-4 font-heading text-base font-semibold text-foreground">
-                                        Dr {d.firstName} {d.lastName}
-                                    </h3>
-                                    <p className="mt-1 text-sm text-primary">{d.specialization}</p>
-                                </Link>
-                            </motion.div>
-                        ))}
+                                <Avatar name={`${doctor.firstName} ${doctor.lastName}`} size={120} />
+                                <h3 className="mt-4 font-heading text-xl font-semibold text-foreground">
+                                    Dr {doctor.firstName} {doctor.lastName}
+                                </h3>
+                                <p className="mt-1 text-sm text-primary">{doctor.specialization}</p>
+                                <p className="mt-3 text-sm text-muted-foreground">
+                                    {doctor.bio || "Stručnjak sa višegodišnjim iskustvom u oblasti protetike i implantologije."}
+                                </p>
+                            </Link>
+                        </motion.div>
                     </div>
                 )}
             </div>

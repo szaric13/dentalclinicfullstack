@@ -13,6 +13,7 @@ const fadeUp = {
 export default function ServicesPage() {
     const { services, loading } = useServices()
 
+    // Grupišemo usluge po specijalizaciji – prikazujemo samo one koje su relevantne
     const grouped = services.reduce((acc, s) => {
         const spec = s.specialization || "Ostalo"
         if (!acc[spec]) acc[spec] = []
@@ -21,7 +22,7 @@ export default function ServicesPage() {
     }, {})
 
     return (
-        <PageWrapper title="Naše usluge" description="Kompletan spisak stomatoloških usluga ordinacije Denta.">
+        <PageWrapper title="Naše usluge" description="Kompletan spisak stomatoloških usluga ordinacije Dr Zarić.">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="mb-10 text-center">
                     <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Naše usluge</h1>

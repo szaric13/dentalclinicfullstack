@@ -33,6 +33,13 @@ export default function BookAppointment() {
         publicApi.services().then(setServices).catch(() => {})
     }, [])
 
+    // Automatski izaberi prvog doktora (dr Zarića) kada se učita
+    useEffect(() => {
+        if (doctors.length && !doctorId) {
+            setDoctorId(String(doctors[0].id))
+        }
+    }, [doctors])
+
     const doctor = useMemo(() => doctors.find(d => String(d.id) === String(doctorId)), [doctors, doctorId])
 
     const filteredServices = useMemo(() => {
@@ -107,7 +114,6 @@ export default function BookAppointment() {
                         <Card>
                             <label className="mb-2 block text-sm font-semibold"><User size={14} className="inline mr-1" /> Doktor</label>
                             <select className="input h-11 w-full rounded-xl border border-input bg-card px-3 text-sm" value={doctorId} onChange={e => setDoctorId(e.target.value)}>
-                                <option value="">— Izaberite —</option>
                                 {doctors.map(d => (
                                     <option key={d.id} value={d.id}>Dr {d.firstName} {d.lastName} — {d.specialization}</option>
                                 ))}
@@ -121,7 +127,7 @@ export default function BookAppointment() {
 
                         <Card>
                             <label className="mb-2 block text-sm font-semibold"><Stethoscope size={14} className="inline mr-1" /> Usluga</label>
-                            <select className="input h-11 w-full rounded-xl border border-input bg-card px-3 text-sm" value={serviceId} onChange={e => setServiceId(e.target.value)} disabled={!doctorId}>
+                            <select className="input h-11 w-full rounded-xl border border-input bg-card px-3 text-sm" value={serviceId} onChange={e => setServiceId(e.target.value)}>
                                 <option value="">— Izaberite —</option>
                                 {filteredServices.map(s => (
                                     <option key={s.id} value={s.id}>{s.name} {s.durationMinutes ? `(${s.durationMinutes} min)` : ""}</option>
@@ -144,7 +150,6 @@ export default function BookAppointment() {
                             </Card>
                         ) : (
                             <Card>
-                                {/* Datum picker */}
                                 <div className="mb-4 flex items-center justify-between">
                                     <button
                                         onClick={() => {
@@ -235,7 +240,6 @@ export default function BookAppointment() {
                 </div>
             </div>
 
-            {/* Modal za profil doktora */}
             <Modal open={!!profileDoctor} onClose={() => setProfileDoctor(null)} title={profileDoctor ? `Dr ${profileDoctor.firstName} ${profileDoctor.lastName}` : ""}>
                 {profileDoctor && (
                     <div className="space-y-3 text-center">
