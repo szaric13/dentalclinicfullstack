@@ -44,6 +44,26 @@ public class Doctor {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // ========== NOVA POLJA ==========
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    private String education;
+
+    private String expertise;
+
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience;
+
+    @Column(name = "working_hours", columnDefinition = "JSON")
+    private String workingHours;
+
+    private String instagram;
+
+    @Column(name = "phone_office")
+    private String phoneOffice;
+    // =================================
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

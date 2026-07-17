@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowLeft, Star, Phone, Mail, MapPin, Award, BookOpen, Calendar, Stethoscope } from "lucide-react"
+import { ArrowLeft, Star, Phone, Mail, Award, BookOpen, Calendar, Stethoscope, Instagram, Clock } from "lucide-react"
 import PageWrapper from "../components/PageWrapper"
 import { Button, Card } from "../components/ui"
 import Avatar from "../components/Avatar"
@@ -35,6 +35,31 @@ export default function DoctorProfilePage() {
         <Link to="/team" className="text-primary hover:underline">← Nazad na tim</Link>
     </div></PageWrapper>
 
+    // Helper za radno vreme (parsiranje JSON)
+    const renderWorkingHours = () => {
+        if (!doctor.workingHours) return null
+        try {
+            const wh = JSON.parse(doctor.workingHours)
+            const days = {
+                ponedeljak: "Ponedeljak",
+                utorak: "Utorak",
+                sreda: "Sreda",
+                cetvrtak: "Četvrtak",
+                petak: "Petak",
+                subota: "Subota",
+                nedelja: "Nedelja"
+            }
+            return Object.entries(days).map(([key, label]) => (
+                <div key={key} className="flex justify-between py-2 border-b border-border last:border-0">
+                    <span className="text-foreground">{label}</span>
+                    <span className="text-muted-foreground">{wh[key] || "Zatvoreno"}</span>
+                </div>
+            ))
+        } catch {
+            return <p className="text-sm text-muted-foreground">Radno vreme nije dostupno</p>
+        }
+    }
+
     return (
         <PageWrapper title={`dr ${doctor.firstName} ${doctor.lastName}`} description={`Profil doktora ${doctor.firstName} ${doctor.lastName} - ${doctor.specialization}`}>
             <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
@@ -60,18 +85,35 @@ export default function DoctorProfilePage() {
                                 </div>
                                 <span className="text-xs text-muted-foreground">({reviews.length} ocena)</span>
                             </div>
+
+                            {/* Kontakt podaci */}
                             <div className="mt-6 space-y-3 text-left text-sm">
-                                {doctor.email && (
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Mail size={14} className="text-primary" /> {doctor.email}
-                                    </div>
-                                )}
                                 {doctor.phone && (
                                     <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Phone size={14} className="text-primary" /> {doctor.phone}
+                                        <Phone size={14} className="text-primary shrink-0" />
+                                        <a href={`tel:${doctor.phone}`} className="hover:text-primary">{doctor.phone}</a>
+                                    </div>
+                                )}
+                                {doctor.phoneOffice && (
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Phone size={14} className="text-primary shrink-0" />
+                                        <span>Ordinacija: <a href={`tel:${doctor.phoneOffice}`} className="hover:text-primary">{doctor.phoneOffice}</a></span>
+                                    </div>
+                                )}
+                                {doctor.email && (
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Mail size={14} className="text-primary shrink-0" />
+                                        <a href={`mailto:${doctor.email}`} className="hover:text-primary">{doctor.email}</a>
+                                    </div>
+                                )}
+                                {doctor.instagram && (
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Instagram size={14} className="text-primary shrink-0" />
+                                        <a href={doctor.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-primary">Instagram</a>
                                     </div>
                                 )}
                             </div>
+
                             <Link to="/login" className="mt-6 block">
                                 <Button className="w-full">
                                     <Calendar size={16} /> Zakažite termin
@@ -80,17 +122,53 @@ export default function DoctorProfilePage() {
                         </Card>
                     </div>
 
-                    {/* Right – bio + reviews */}
+                    {/* Right – bio + reviews + dodatne informacije */}
                     <div className="lg:col-span-2 space-y-6">
+                        {/* Biografija */}
                         <Card>
                             <h2 className="font-heading text-xl font-semibold mb-3 flex items-center gap-2">
                                 <BookOpen size={20} className="text-primary" /> Biografija
                             </h2>
-                            <p className="text-muted-foreground leading-relaxed">
+                            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                                 {doctor.bio || `Dr ${doctor.firstName} ${doctor.lastName} je stručnjak iz oblasti ${doctor.specialization}. Posvećen pružanju najkvalitetnije stomatološke nege svojim pacijentima.`}
                             </p>
                         </Card>
 
+                        {/* Edukacija, ekspertiza, godine iskustva */}
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {doctor.education && (
+                                <Card>
+                                    <h3 className="font-heading text-sm font-semibold text-muted-foreground uppercase tracking-wide">Edukacija</h3>
+                                    <p className="mt-2 text-foreground">{doctor.education}</p>
+                                </Card>
+                            )}
+                            {doctor.expertise && (
+                                <Card>
+                                    <h3 className="font-heading text-sm font-semibold text-muted-foreground uppercase tracking-wide">Ekspertiza</h3>
+                                    <p className="mt-2 text-foreground">{doctor.expertise}</p>
+                                </Card>
+                            )}
+                            {doctor.yearsOfExperience && (
+                                <Card>
+                                    <h3 className="font-heading text-sm font-semibold text-muted-foreground uppercase tracking-wide">Godine prakse</h3>
+                                    <p className="mt-2 text-foreground">{doctor.yearsOfExperience} godina</p>
+                                </Card>
+                            )}
+                        </div>
+
+                        {/* Radno vreme */}
+                        {doctor.workingHours && (
+                            <Card>
+                                <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <Clock size={20} className="text-primary" /> Radno vreme
+                                </h2>
+                                <div className="rounded-xl border border-border bg-background p-4">
+                                    {renderWorkingHours()}
+                                </div>
+                            </Card>
+                        )}
+
+                        {/* Ocene pacijenata */}
                         <Card>
                             <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
                                 <Star size={20} className="text-warning" /> Ocene pacijenata
@@ -114,8 +192,8 @@ export default function DoctorProfilePage() {
                                                     ))}
                                                 </div>
                                                 <span className="text-xs text-muted-foreground">
-                          {new Date(r.createdAt).toLocaleDateString("sr-RS")}
-                        </span>
+                                                    {new Date(r.createdAt).toLocaleDateString("sr-RS")}
+                                                </span>
                                             </div>
                                             {r.comment && <p className="mt-2 text-sm text-foreground">{r.comment}</p>}
                                         </motion.div>
