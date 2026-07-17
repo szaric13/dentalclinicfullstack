@@ -24,7 +24,7 @@ import TeamPage from "./pages/TeamPage.jsx"
 import BlogPage from "./pages/BlogPage.jsx"
 import ProfilePage from "./pages/ProfilePage.jsx"
 import NotFoundPage from "./pages/NotFoundPage.jsx"
-import NursesPage from "@/pages/NursePage.js";
+import NursesPage from "./pages/NursePage.jsx";
 
 export default function App() {
   const location = useLocation()

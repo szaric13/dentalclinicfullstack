@@ -1,18 +1,17 @@
-import { Link } from "react-router-dom"
-import { motion } from "framer-motion"
 import { useEffect } from "react"
-import { Phone, Mail, Clock, Award, BookOpen, Stethoscope } from "lucide-react"
+import { motion } from "framer-motion"
 import PageWrapper from "../components/PageWrapper"
+import { useNurses } from "../hooks/usePublicData"
 import Avatar from "../components/Avatar"
 import { Card } from "../components/ui"
-import { useNurses } from "../hooks/usePublicData"
+import { Phone, Mail, Clock, Award, BookOpen } from "lucide-react"
 
 const fadeUp = {
     hidden: { opacity: 0, y: 24 },
     show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.5 } }),
 }
 
-export default function NursesPage() {
+export default function NursePage() {
     const { nurses, loading, refetch } = useNurses()
 
     useEffect(() => {
@@ -59,17 +58,13 @@ export default function NursesPage() {
                                         {n.phone && (
                                             <div className="flex items-center gap-2">
                                                 <Phone size={14} className="text-primary" />
-                                                <a href={`tel:${n.phone}`} className="hover:text-primary">
-                                                    {n.phone}
-                                                </a>
+                                                <a href={`tel:${n.phone}`} className="hover:text-primary">{n.phone}</a>
                                             </div>
                                         )}
                                         {n.email && (
                                             <div className="flex items-center gap-2">
                                                 <Mail size={14} className="text-primary" />
-                                                <a href={`mailto:${n.email}`} className="hover:text-primary">
-                                                    {n.email}
-                                                </a>
+                                                <a href={`mailto:${n.email}`} className="hover:text-primary">{n.email}</a>
                                             </div>
                                         )}
                                         {n.yearsOfExperience && (
@@ -90,38 +85,6 @@ export default function NursesPage() {
                                         <p className="mt-4 text-sm leading-relaxed text-muted-foreground line-clamp-4">
                                             {n.bio}
                                         </p>
-                                    )}
-
-                                    {n.workingHours && (
-                                        <details className="mt-4">
-                                            <summary className="cursor-pointer text-sm font-semibold text-primary hover:underline">
-                                                <Clock size={14} className="inline mr-1" /> Radno vreme
-                                            </summary>
-                                            <div className="mt-3 space-y-1 text-sm">
-                                                {(() => {
-                                                    try {
-                                                        const wh = JSON.parse(n.workingHours)
-                                                        const days = {
-                                                            ponedeljak: "Ponedeljak",
-                                                            utorak: "Utorak",
-                                                            sreda: "Sreda",
-                                                            cetvrtak: "Četvrtak",
-                                                            petak: "Petak",
-                                                            subota: "Subota",
-                                                            nedelja: "Nedelja"
-                                                        }
-                                                        return Object.entries(days).map(([key, label]) => (
-                                                            <div key={key} className="flex justify-between text-xs">
-                                                                <span className="text-muted-foreground">{label}</span>
-                                                                <span className="text-foreground">{wh[key] || "Zatvoreno"}</span>
-                                                            </div>
-                                                        ))
-                                                    } catch {
-                                                        return <p className="text-xs text-muted-foreground">Radno vreme nije dostupno</p>
-                                                    }
-                                                })()}
-                                            </div>
-                                        </details>
                                     )}
                                 </Card>
                             </motion.div>
