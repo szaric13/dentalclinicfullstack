@@ -57,6 +57,7 @@ function Hero() {
                         </Button>
                     </Link>
                 </div>
+                {/* Google ocena – ZAKOMENTARISANO */}
                 {/*
         <div className="mt-8 flex items-center gap-6">
           <div className="flex items-center gap-2">

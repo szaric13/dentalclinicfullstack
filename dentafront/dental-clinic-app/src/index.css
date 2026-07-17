@@ -1,13 +1,4 @@
 @import "tailwindcss";
-html {
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-body {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
 
 @custom-variant dark (&:is(.dark *));
 

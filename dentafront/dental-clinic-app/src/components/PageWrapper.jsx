@@ -9,7 +9,7 @@ export default function PageWrapper({ children, title, description, className = 
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}
+          className={className}
       >
         <Helmet>
           <title>{title ? `${title} | ${CLINIC.name}` : `${CLINIC.name} — ${CLINIC.tagline}`}</title>

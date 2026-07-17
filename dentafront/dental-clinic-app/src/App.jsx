@@ -24,8 +24,8 @@ import TeamPage from "./pages/TeamPage.jsx"
 import BlogPage from "./pages/BlogPage.jsx"
 import ProfilePage from "./pages/ProfilePage.jsx"
 import NotFoundPage from "./pages/NotFoundPage.jsx"
-import NursesPage from "./pages/NursePage.jsx"                // lista svih sestara (ako želiš)
-import NurseProfilePage from "./pages/NurseProfilePage.jsx"   // ✅ NOVO – detalji sestre
+import NursesPage from "./pages/NursePage.jsx"
+import NurseProfilePage from "./pages/NurseProfilePage.jsx"
 
 export default function App() {
     const location = useLocation()
@@ -43,13 +43,8 @@ export default function App() {
                         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                         <Route path="/reset-password" element={<ResetPasswordPage />} />
                         <Route path="/doctor" element={<DoctorLoginPage />} />
-
-                        {/* ✅ Ruta za listu sestara (ako je koristiš) */}
                         <Route path="/nurses" element={<NursesPage />} />
-
-                        {/* ✅ NOVA RUTA – profil pojedinačne sestre */}
                         <Route path="/nurse/:id" element={<NurseProfilePage />} />
-
                         <Route path="/services" element={<ServicesPage />} />
                         <Route path="/services/specialty/:specialty" element={<SpecialtyPage />} />
                         <Route path="/services/:id" element={<ServiceDetailPage />} />

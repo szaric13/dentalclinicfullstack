@@ -6,6 +6,7 @@ export default function Footer() {
   return (
       <footer className="mt-auto border-t border-border bg-foreground text-background">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3 lg:px-8">
+          {/* Brand */}
           <div>
             <div className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
               <img
@@ -16,10 +17,11 @@ export default function Footer() {
               {CLINIC.name}
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-background/70">
-              {CLINIC.tagline}. Savremena stomatološka ordinacija posvećena vašem osmehu.
+              {CLINIC.tagline}. Savremena stomatološka ordinacija posvećena vašem osmehu i udobnosti.
             </p>
           </div>
 
+          {/* Links */}
           <div>
             <h4 className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-background/60">
               Usluge
@@ -38,6 +40,7 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Contact */}
           <div>
             <h4 className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-background/60">
               Kontakt
