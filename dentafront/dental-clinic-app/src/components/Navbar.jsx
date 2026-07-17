@@ -16,8 +16,8 @@ import {
 import { useTheme } from "../context/ThemeContext"
 import { useLanguage } from "../context/LanguageContext"
 import { useAuth } from "../context/AuthContext"
-import { useDoctors, useNurses } from "../hooks/usePublicData"
-import { SPECIALTIES, CLINIC } from "../lib/data"
+import { useDoctors } from "../hooks/usePublicData"
+import { SPECIALTIES, NURSES, CLINIC } from "../lib/data"
 import { Button } from "./ui"
 import { cn } from "../lib/utils"
 import toast from "react-hot-toast"
@@ -72,7 +72,6 @@ export default function Navbar() {
   const { lang, toggleLang, t } = useLanguage()
   const { isAuthenticated, role, logout } = useAuth()
   const { doctors } = useDoctors()
-  const { nurses, loading: nursesLoading } = useNurses()
   const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -120,12 +119,15 @@ export default function Navbar() {
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
-            <img
-                src="/images/logonz.png"
-                alt={CLINIC.name}
-                className="h-9 w-9 object-contain"
-            />
-            <span className="hidden sm:inline">{CLINIC.name}</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                  d="M12 2c2.5 0 4 1.5 5 1.5S19.5 3 21 4c0 5-1 9-2.5 13-.7 1.9-1.3 3-2.5 3s-1.5-2.5-2-4.5c-.4-1.6-.8-2.5-2-2.5s-1.6.9-2 2.5C9.5 17.5 9.2 20 8 20s-1.8-1.1-2.5-3C4 13 3 9 3 4c1.5-1 2.5-.5 3-1.5S9.5 2 12 2Z"
+                  fill="currentColor"
+              />
+            </svg>
+          </span>
+            {CLINIC.name}
           </Link>
 
           {/* Center nav */}
@@ -173,26 +175,16 @@ export default function Navbar() {
                   </Link>
               ))}
               <div className="my-1 h-px bg-border" />
-
-              {nursesLoading ? (
-                  <div className="px-3 py-2 text-sm text-muted-foreground">Učitavanje...</div>
-              ) : nurses.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-muted-foreground">Nema medicinskih sestara</div>
-              ) : (
-                  <>
-                    {nurses.slice(0, 6).map((n) => (
-                        <Link
-                            key={n.id}
-                            to={`/nurse/${n.id}`}
-                            className="block rounded-lg px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground"
-                        >
-                          {n.firstName} {n.lastName}
-                          <span className="block text-xs text-muted-foreground">{n.role}</span>
-                        </Link>
-                    ))}
-                  </>
-              )}
-
+              {NURSES.map((n) => (
+                  <Link
+                      key={n.slug}
+                      to={`/profile/${n.slug}`}
+                      className="block rounded-lg px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    {n.name}
+                    <span className="block text-xs text-muted-foreground">{n.role}</span>
+                  </Link>
+              ))}
               <div className="my-1 h-px bg-border" />
               <Link
                   to="/team"
@@ -309,7 +301,7 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* Mobile menu */}
+        {/* Mobile menu – SVI NAZIVI NA SRPSKOM (hardkodirano) */}
         <AnimatePresence>
           {mobileOpen && (
               <motion.div
@@ -319,38 +311,68 @@ export default function Navbar() {
                   className="overflow-hidden border-t border-border bg-background lg:hidden"
               >
                 <div className="flex flex-col gap-1 px-4 py-4 sm:px-6">
-                  {[
-                    { to: "/", label: t("home") },
-                    { to: "/services", label: t("services") },
-                    { to: "/team", label: t("team") },
-                    { to: "/blog", label: t("blog") },
-                    { to: "/contact", label: t("contact") },
-                  ].map((l) => (
-                      <NavLink
-                          key={l.to}
-                          to={l.to}
-                          onClick={() => setMobileOpen(false)}
-                          className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
-                      >
-                        {l.label}
-                      </NavLink>
-                  ))}
+                  <NavLink
+                      to="/"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  >
+                    Početna
+                  </NavLink>
+                  <NavLink
+                      to="/services"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  >
+                    Usluge
+                  </NavLink>
+                  <NavLink
+                      to="/team"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  >
+                    Naš tim
+                  </NavLink>
+                  <NavLink
+                      to="/blog"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  >
+                    Blog
+                  </NavLink>
+                  <NavLink
+                      to="/contact"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  >
+                    Kontakt
+                  </NavLink>
                   <div className="my-2 h-px bg-border" />
                   {isAuthenticated ? (
                       <>
-                        <Button variant="outline" onClick={() => { navigate(dashboardLink); setMobileOpen(false) }}>
+                        <Button
+                            variant="outline"
+                            onClick={() => { navigate(dashboardLink); setMobileOpen(false) }}
+                            className="justify-start"
+                        >
                           Moj profil
                         </Button>
-                        <Button variant="ghost" onClick={handleLogout}>
+                        <Button variant="ghost" onClick={handleLogout} className="justify-start">
                           {t("logout")}
                         </Button>
                       </>
                   ) : (
                       <>
-                        <Button variant="outline" onClick={() => { navigate("/login"); setMobileOpen(false) }}>
+                        <Button
+                            variant="outline"
+                            onClick={() => { navigate("/login"); setMobileOpen(false) }}
+                            className="justify-start"
+                        >
                           {t("login")}
                         </Button>
-                        <Button onClick={() => { navigate("/register"); setMobileOpen(false) }}>
+                        <Button
+                            onClick={() => { navigate("/register"); setMobileOpen(false) }}
+                            className="justify-start"
+                        >
                           {t("bookNow")}
                         </Button>
                       </>

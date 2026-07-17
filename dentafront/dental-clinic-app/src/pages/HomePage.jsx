@@ -97,14 +97,16 @@ function Stats() {
     ]
     return (
         <Section className="py-6">
-            <div className="grid grid-cols-2 gap-4 rounded-3xl border border-border bg-card p-6 md:grid-cols-4">
-                {items.map((it, i) => (
-                    <div key={i} className="flex flex-col items-center gap-2 text-center">
-                        <it.icon size={24} className="text-primary" />
-                        <span className="font-heading text-2xl font-bold text-foreground">{it.value}</span>
-                        <span className="text-xs text-muted-foreground">{it.label}</span>
-                    </div>
-                ))}
+            <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-card p-6 md:p-8">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    {items.map((it, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2 text-center">
+                            <it.icon size={28} className="text-primary" />
+                            <span className="font-heading text-2xl font-bold text-foreground">{it.value}</span>
+                            <span className="text-xs text-muted-foreground">{it.label}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
         </Section>
     )
