@@ -118,14 +118,14 @@ export default function Navbar() {
           )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          {/* Logo – slika umesto SVG */}
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
             <img
                 src="/images/logonz.png"
                 alt={CLINIC.name}
                 className="h-9 w-9 object-contain"
             />
-            {CLINIC.name}
+            <span className="hidden sm:inline">{CLINIC.name}</span>
           </Link>
 
           {/* Center nav */}
