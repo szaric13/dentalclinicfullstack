@@ -57,20 +57,7 @@ function Hero() {
                         </Button>
                     </Link>
                 </div>
-                {/* Google ocena – ZAKOMENTARISANO */}
-                {/*
-        <div className="mt-8 flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} size={18} className="text-warning" fill="currentColor" />
-              ))}
-            </div>
-            <span className="text-sm font-semibold text-foreground">{CLINIC.googleRating}</span>
-            <span className="text-sm text-muted-foreground">Google ocena</span>
-          </div>
-        </div>
-        */}
+                {/* Google zakomentarisan */}
             </motion.div>
 
             <motion.div
