@@ -15,23 +15,26 @@ public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final PasswordEncoder passwordEncoder;
+
     public Optional<Doctor> findByEmail(String email) {
         return doctorRepository.findByEmail(email);
     }
 
+    // ✅ IZMENJENO: vraća samo aktivne, neobrisane doktore
     public List<Doctor> getAllDoctors() {
-        return doctorRepository.findAll();
+        return doctorRepository.findByDeletedFalseAndActiveTrue();
     }
 
     public Doctor saveDoctor(Doctor doctor) {
         return doctorRepository.save(doctor);
     }
+
     public Doctor getById(Long id) {
         return doctorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Doktor nije pronađen"));
     }
 
-
+    // ✅ Soft delete – označava kao obrisanog i neaktivnog
     public void softDelete(Long id) {
         Doctor doctor = getById(id);
         doctor.setDeleted(true);

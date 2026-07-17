@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
+import { useEffect } from "react"
 import PageWrapper from "../components/PageWrapper"
 import Avatar from "../components/Avatar"
 import { useDoctors } from "../hooks/usePublicData"
@@ -10,7 +11,29 @@ const fadeUp = {
 }
 
 export default function TeamPage() {
-    const { doctors, loading } = useDoctors()
+    const { doctors, loading, refetch } = useDoctors()
+
+    // ✅ Automatski osveži podatke kad se stranica fokusira
+    useEffect(() => {
+        const handleFocus = () => {
+            refetch()
+        }
+
+        // Osveži i kad se vratiš na tab (visibility change)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                refetch()
+            }
+        }
+
+        window.addEventListener("focus", handleFocus)
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        return () => {
+            window.removeEventListener("focus", handleFocus)
+            document.removeEventListener("visibilitychange", handleVisibilityChange)
+        }
+    }, [refetch])
 
     return (
         <PageWrapper title="Naš tim" description="Upoznajte naše stomatologe i stručni tim.">

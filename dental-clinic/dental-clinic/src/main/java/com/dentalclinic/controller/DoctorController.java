@@ -25,6 +25,7 @@ public class DoctorController {
     private final DoctorService doctorService;
     private final AppointmentService appointmentService;
     private final DoctorWorkingHoursService workingHoursService;
+
     @GetMapping("/profile")
     public ResponseEntity<Doctor> getProfile() {
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -96,13 +97,25 @@ public class DoctorController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PutMapping("/working-hours")
     public ResponseEntity<String> updateWorkingHours(@RequestBody DoctorWorkingHoursRequest request) {
         try {
             Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            request.setDoctorId(userId);   // osiguravamo da doktor menja samo svoje radno vreme
+            request.setDoctorId(userId);
             workingHoursService.saveOrUpdate(request);
             return ResponseEntity.ok("Radno vreme ažurirano.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable Long id) {
+        try {
+            doctorService.softDelete(id);
+            return ResponseEntity.ok("Doktor uspešno obrisan (soft delete).");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
