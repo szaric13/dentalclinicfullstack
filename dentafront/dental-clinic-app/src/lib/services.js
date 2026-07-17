@@ -24,7 +24,7 @@ export const authApi = {
   doctorLogin: (payload) => api.post("/auth/doctor/login", payload).then((r) => r.data),
   logout: () => {
     const refreshToken = storage.refreshToken
-    return api.post("/auth/logout", { refreshToken }).catch(() => {})
+    return api.post( "/auth/logout", { refreshToken }).catch(() => {})
   },
 }
 
