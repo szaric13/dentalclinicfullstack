@@ -35,7 +35,6 @@ export default function DoctorProfilePage() {
         <Link to="/team" className="text-primary hover:underline">← Nazad na tim</Link>
     </div></PageWrapper>
 
-    // Helper za radno vreme (parsiranje JSON)
     const renderWorkingHours = () => {
         if (!doctor.workingHours) return null
         try {
@@ -71,7 +70,16 @@ export default function DoctorProfilePage() {
                     {/* Left – profile card */}
                     <div className="lg:col-span-1">
                         <Card className="text-center p-8">
-                            <Avatar name={`${doctor.firstName} ${doctor.lastName}`} size={120} className="mx-auto" />
+                            {/* ✅ PRIKAZ SLIKE AKO POSTOJI */}
+                            {doctor.profileImage ? (
+                                <img
+                                    src={doctor.profileImage}
+                                    alt={`${doctor.firstName} ${doctor.lastName}`}
+                                    className="h-32 w-32 rounded-full object-cover mx-auto"
+                                />
+                            ) : (
+                                <Avatar name={`${doctor.firstName} ${doctor.lastName}`} size={120} className="mx-auto" />
+                            )}
                             <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">
                                 dr {doctor.firstName} {doctor.lastName}
                             </h1>
@@ -86,7 +94,6 @@ export default function DoctorProfilePage() {
                                 <span className="text-xs text-muted-foreground">({reviews.length} ocena)</span>
                             </div>
 
-                            {/* Kontakt podaci */}
                             <div className="mt-6 space-y-3 text-left text-sm">
                                 {doctor.phone && (
                                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -122,9 +129,7 @@ export default function DoctorProfilePage() {
                         </Card>
                     </div>
 
-                    {/* Right – bio + reviews + dodatne informacije */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Biografija */}
                         <Card>
                             <h2 className="font-heading text-xl font-semibold mb-3 flex items-center gap-2">
                                 <BookOpen size={20} className="text-primary" /> Biografija
@@ -134,7 +139,6 @@ export default function DoctorProfilePage() {
                             </p>
                         </Card>
 
-                        {/* Edukacija, ekspertiza, godine iskustva */}
                         <div className="grid gap-4 sm:grid-cols-2">
                             {doctor.education && (
                                 <Card>
@@ -156,7 +160,6 @@ export default function DoctorProfilePage() {
                             )}
                         </div>
 
-                        {/* Radno vreme */}
                         {doctor.workingHours && (
                             <Card>
                                 <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
@@ -168,7 +171,6 @@ export default function DoctorProfilePage() {
                             </Card>
                         )}
 
-                        {/* Ocene pacijenata */}
                         <Card>
                             <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
                                 <Star size={20} className="text-warning" /> Ocene pacijenata

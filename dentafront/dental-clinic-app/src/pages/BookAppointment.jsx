@@ -253,7 +253,9 @@ export default function BookAppointment() {
                             <Avatar name={`${profileDoctor.firstName} ${profileDoctor.lastName}`} size={80} className="mx-auto" />
                         )}
                         <p className="font-semibold text-primary">{profileDoctor.specialization}</p>
-                        <p className="text-sm text-muted-foreground">{profileDoctor.bio || "Stručnjak sa višegodišnjim iskustvom."}</p>
+                        <p className="text-sm text-muted-foreground">
+                            {profileDoctor.yearsOfExperience ? `${profileDoctor.yearsOfExperience} godina iskustva` : ''}
+                        </p>
                     </div>
                 )}
             </Modal>

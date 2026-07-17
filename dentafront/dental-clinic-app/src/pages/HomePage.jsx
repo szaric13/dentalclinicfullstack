@@ -202,8 +202,8 @@ function DoctorSection() {
                         Dr {d.firstName} {d.lastName}
                     </h3>
                     <p className="mt-1 text-sm text-primary">{d.specialization}</p>
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        {d.bio || "Stručnjak sa višegodišnjim iskustvom u oblasti protetike i implantologije."}
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {d.yearsOfExperience ? `${d.yearsOfExperience} godina iskustva` : ''}
                     </p>
                 </Link>
             </div>
