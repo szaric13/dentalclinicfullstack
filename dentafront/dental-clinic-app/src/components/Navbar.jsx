@@ -108,6 +108,9 @@ export default function Navbar() {
     navigate("/services")
   }
 
+  // ✅ Logo u zavisnosti od teme
+  const logoSrc = theme === "dark" ? "/images/logonzdark.png" : "/images/logonz.png"
+
   return (
       <header
           className={cn(
@@ -118,10 +121,10 @@ export default function Navbar() {
           )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          {/* Logo – sada koristi sliku iz public/images/logonz */}
+          {/* Logo – menja se sa temom */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
             <img
-                src="/images/logonz.png"
+                src={logoSrc}
                 alt={CLINIC.name}
                 className="h-9 w-9 object-contain"
             />

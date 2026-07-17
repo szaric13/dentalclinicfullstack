@@ -37,6 +37,20 @@ export const SPECIALTIES = [
     description:
         "Fiksna stomatološka protetika obuhvata izradu krunica, mostova i navlaka od najkvalitetnijih materijala. Dr Nenad Zarić se specijalizovao za ovu oblast sa više od 25 godina iskustva, pružajući pacijentima trajna i estetski savršena rešenja za obnovu osmeha.",
   },
+  {
+    slug: "decija-stomatologija",
+    name: "Dečija stomatologija",
+    short: "Nežan pristup najmlađim pacijentima.",
+    description:
+        "Dečija stomatologija pruža nežnu i strpljivu negu najmlađima, sa fokusom na prevenciju i pozitivno iskustvo kod stomatologa.",
+  },
+  {
+    slug: "ostalo",
+    name: "Ostalo",
+    short: "Dodatne stomatološke usluge.",
+    description:
+        "Ostale usluge koje nisu svrstane u specijalizacije, kao što su plombiranje mlečnih zuba i slično.",
+  },
 ];
 
 // SAMO TANJA LEKIĆ – ostale sestre izbačene
