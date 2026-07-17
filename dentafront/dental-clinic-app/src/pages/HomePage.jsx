@@ -12,8 +12,6 @@ import {
     ArrowRight,
     Stethoscope,
     Sparkles,
-    Users,
-    Award,
 } from "lucide-react"
 import PageWrapper from "../components/PageWrapper"
 import { Button } from "../components/ui"
@@ -59,7 +57,6 @@ function Hero() {
                         </Button>
                     </Link>
                 </div>
-                {/* Google ocena ZAKOMENTARISANA */}
                 {/*
         <div className="mt-8 flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -106,10 +103,9 @@ function Hero() {
 
 function Stats() {
     const items = [
-        { icon: Award, value: "15+", label: "godina iskustva" },
-        { icon: Users, value: "20.000+", label: "zadovoljnih pacijenata" },
+        { icon: Stethoscope, value: "15+", label: "godina iskustva" },
+        { icon: CalendarCheck, value: "20.000+", label: "zadovoljnih pacijenata" },
         { icon: ShieldCheck, value: "100%", label: "posvećenost kvalitetu" },
-        { icon: Sparkles, value: "Savremene", label: "tehnologije" },
     ]
     return (
         <Section className="py-6">

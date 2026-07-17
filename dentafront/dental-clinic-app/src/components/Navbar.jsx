@@ -118,7 +118,6 @@ export default function Navbar() {
           )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          {/* Logo – uvek isti bez obzira na temu */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
             <img
                 src="/images/logonz.png"
@@ -128,7 +127,6 @@ export default function Navbar() {
             {CLINIC.name}
           </Link>
 
-          {/* Center nav – isti */}
           <div className="hidden items-center gap-1 lg:flex">
             <NavLink
                 to="/"
@@ -226,7 +224,6 @@ export default function Navbar() {
             </NavLink>
           </div>
 
-          {/* Right actions – isti */}
           <div className="flex items-center gap-1">
             <button
                 onClick={() => setSearchOpen((o) => !o)}
@@ -283,7 +280,6 @@ export default function Navbar() {
           </div>
         </nav>
 
-        {/* Search bar – isti */}
         <AnimatePresence>
           {searchOpen && (
               <motion.div
@@ -309,7 +305,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* Mobile menu – isti */}
         <AnimatePresence>
           {mobileOpen && (
               <motion.div
