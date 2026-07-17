@@ -2,9 +2,12 @@ package com.dentalclinic.controller;
 
 import com.dentalclinic.model.Doctor;
 import com.dentalclinic.model.DentalService;
+import com.dentalclinic.model.Nurse;
 import com.dentalclinic.service.DoctorService;
+import com.dentalclinic.service.NurseService;          // ✅ DODAT IMPORT
 import com.dentalclinic.service.ServiceCatalogService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +21,7 @@ public class PublicController {
 
     private final DoctorService doctorService;
     private final ServiceCatalogService serviceCatalogService;
+    private final NurseService nurseService;           // ✅ DODATO POLJE
 
     @GetMapping("/doctors")
     public List<Doctor> getDoctors() {
@@ -27,5 +31,10 @@ public class PublicController {
     @GetMapping("/services")
     public List<DentalService> getServices() {
         return serviceCatalogService.getAvailableServices();
+    }
+
+    @GetMapping("/nurses")
+    public ResponseEntity<List<Nurse>> getNurses() {
+        return ResponseEntity.ok(nurseService.getAllActiveNurses());
     }
 }
