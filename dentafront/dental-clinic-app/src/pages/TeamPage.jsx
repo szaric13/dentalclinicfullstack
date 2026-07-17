@@ -13,13 +13,12 @@ const fadeUp = {
 export default function TeamPage() {
     const { doctors, loading, refetch } = useDoctors()
 
-    // ✅ Automatski osveži podatke kad se stranica fokusira
+    // Automatski osveži podatke kad se stranica fokusira
     useEffect(() => {
         const handleFocus = () => {
             refetch()
         }
 
-        // Osveži i kad se vratiš na tab (visibility change)
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
                 refetch()
