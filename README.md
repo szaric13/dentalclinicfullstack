@@ -4,6 +4,9 @@ A production-ready full-stack web application developed for a real dental clinic
 
 The application provides secure authentication, intelligent appointment scheduling, automated notifications, and role-based access control for patients, doctors, and administrators.
 
+**Live Demo:** [dentalclinicfullstack.onrender.com](https://dentalclinicfullstack.onrender.com)  
+**Dockerfile:** [Dockerfile](https://github.com/szaric13/dentalclinicfullstack/blob/main/Dockerfile)
+
 ---
 
 ## Tech Stack
@@ -27,11 +30,18 @@ The application provides secure authentication, intelligent appointment scheduli
 - React Router
 - Axios
 - React Big Calendar
-- Tailwind CSS (ili Custom CSS ako stvarno ne koristiš Tailwind)
+- Tailwind CSS
+
+### DevOps & Deployment
+- Docker (multi-stage build for frontend + backend)
+- GitHub Actions (CI/CD pipeline – automated build & tests)
+- Render (cloud deployment)
 
 ---
 
 ## Key Features
+
+*(ostavljam sve isto kao u originalu, ispod su samo ključne tačke bez izmena)*
 
 ### Authentication
 - JWT authentication with refresh tokens
@@ -70,21 +80,17 @@ The application provides secure authentication, intelligent appointment scheduli
 
 ## Testing
 
-- 27 automated integration tests
-- Authentication
-- Booking
-- Cancellation
+- **30+ automated integration tests**
+- Authentication flows
+- Booking and cancellation logic
 - Reviews
 - Public API endpoints
 
-
+---
 
 ## Future Improvements
 
-- Docker support
-- Swagger/OpenAPI
-- CI/CD
-- Deployment
+- Swagger/OpenAPI documentation
 - Redis caching
-
-
+- Role-based admin dashboard
+- End-to-end (E2E) tests
