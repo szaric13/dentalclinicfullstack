@@ -47,7 +47,15 @@ export default function NursePage() {
                             >
                                 <Card className="p-6 h-full flex flex-col">
                                     <div className="flex flex-col items-center text-center">
-                                        <Avatar name={`${n.firstName} ${n.lastName}`} size={80} />
+                                        {n.profileImage ? (
+                                            <img
+                                                src={n.profileImage}
+                                                alt={`${n.firstName} ${n.lastName}`}
+                                                className="h-20 w-20 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <Avatar name={`${n.firstName} ${n.lastName}`} size={80} />
+                                        )}
                                         <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">
                                             {n.firstName} {n.lastName}
                                         </h3>

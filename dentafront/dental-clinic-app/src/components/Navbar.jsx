@@ -16,8 +16,8 @@ import {
 import { useTheme } from "../context/ThemeContext"
 import { useLanguage } from "../context/LanguageContext"
 import { useAuth } from "../context/AuthContext"
-import { useDoctors, useNurses } from "../hooks/usePublicData"  // ✅ dodato useNurses
-import { SPECIALTIES, CLINIC } from "../lib/data"               // ✅ NURSES uklonjen
+import { useDoctors, useNurses } from "../hooks/usePublicData"
+import { SPECIALTIES, CLINIC } from "../lib/data"
 import { Button } from "./ui"
 import { cn } from "../lib/utils"
 import toast from "react-hot-toast"
@@ -72,7 +72,7 @@ export default function Navbar() {
   const { lang, toggleLang, t } = useLanguage()
   const { isAuthenticated, role, logout } = useAuth()
   const { doctors } = useDoctors()
-  const { nurses, loading: nursesLoading } = useNurses()  // ✅ nova hook
+  const { nurses, loading: nursesLoading } = useNurses()
   const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -118,20 +118,17 @@ export default function Navbar() {
           )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
+          {/* Logo – sada koristi sliku iz public/images/logonz */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                  d="M12 2c2.5 0 4 1.5 5 1.5S19.5 3 21 4c0 5-1 9-2.5 13-.7 1.9-1.3 3-2.5 3s-1.5-2.5-2-4.5c-.4-1.6-.8-2.5-2-2.5s-1.6.9-2 2.5C9.5 17.5 9.2 20 8 20s-1.8-1.1-2.5-3C4 13 3 9 3 4c1.5-1 2.5-.5 3-1.5S9.5 2 12 2Z"
-                  fill="currentColor"
-              />
-            </svg>
-          </span>
+            <img
+                src="/images/logonz"
+                alt={CLINIC.name}
+                className="h-9 w-9 object-contain"
+            />
             {CLINIC.name}
           </Link>
 
-          {/* Center nav */}
+          {/* Center nav – isti */}
           <div className="hidden items-center gap-1 lg:flex">
             <NavLink
                 to="/"
@@ -165,7 +162,6 @@ export default function Navbar() {
             </Dropdown>
 
             <Dropdown label={t("team")} width="w-72">
-              {/* Doktori */}
               {doctors.slice(0, 6).map((d) => (
                   <Link
                       key={d.id}
@@ -178,7 +174,6 @@ export default function Navbar() {
               ))}
               <div className="my-1 h-px bg-border" />
 
-              {/* Sestre – dinamički iz baze */}
               {nursesLoading ? (
                   <div className="px-3 py-2 text-sm text-muted-foreground">Učitavanje...</div>
               ) : nurses.length === 0 ? (
@@ -231,7 +226,7 @@ export default function Navbar() {
             </NavLink>
           </div>
 
-          {/* Right actions – isto kao pre */}
+          {/* Right actions – isti */}
           <div className="flex items-center gap-1">
             <button
                 onClick={() => setSearchOpen((o) => !o)}

@@ -62,6 +62,9 @@ public class Doctor {
 
     @Column(name = "phone_office")
     private String phoneOffice;
+
+    @Column(name = "profile_image")
+    private String profileImage;
     // =================================
 
     @PrePersist

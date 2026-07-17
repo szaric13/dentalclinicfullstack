@@ -13,14 +13,12 @@ const fadeUp = {
 export default function TeamPage() {
     const { doctors, loading, refetch } = useDoctors()
 
-    // Automatsko osvežavanje
     useEffect(() => {
         const handleFocus = () => refetch()
         window.addEventListener("focus", handleFocus)
         return () => window.removeEventListener("focus", handleFocus)
     }, [refetch])
 
-    // Uzmemo samo prvog doktora (dr Zarića)
     const doctor = doctors[0]
 
     return (
@@ -50,7 +48,15 @@ export default function TeamPage() {
                                 to={`/doctor/${doctor.id}`}
                                 className="group flex flex-col items-center rounded-2xl border border-border bg-card p-8 text-center transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg"
                             >
-                                <Avatar name={`${doctor.firstName} ${doctor.lastName}`} size={120} />
+                                {doctor.profileImage ? (
+                                    <img
+                                        src={doctor.profileImage}
+                                        alt={`Dr ${doctor.firstName} ${doctor.lastName}`}
+                                        className="h-30 w-30 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <Avatar name={`${doctor.firstName} ${doctor.lastName}`} size={120} />
+                                )}
                                 <h3 className="mt-4 font-heading text-xl font-semibold text-foreground">
                                     Dr {doctor.firstName} {doctor.lastName}
                                 </h3>

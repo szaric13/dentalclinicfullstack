@@ -175,33 +175,40 @@ function ServicesPreview() {
 }
 
 function DoctorSection() {
-  const { doctors } = useDoctors()
-  // Prikazujemo samo prvog doktora (tj. dr Zarića)
-  const d = doctors[0]
-  if (!d) return null
-  return (
-      <Section className="py-16">
-        <div className="mb-10 text-center">
-          <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Vaš stomatolog</h2>
-          <p className="mt-3 text-muted-foreground">Dr Nenad Zarić – specijalista protetike</p>
-        </div>
-        <div className="mx-auto max-w-md">
-          <Link
-              to={`/doctor/${d.id}`}
-              className="group flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg"
-          >
-            <Avatar name={`${d.firstName} ${d.lastName}`} size={96} />
-            <h3 className="mt-4 font-heading text-xl font-semibold text-foreground">
-              Dr {d.firstName} {d.lastName}
-            </h3>
-            <p className="mt-1 text-sm text-primary">{d.specialization}</p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {d.bio || "Stručnjak sa višegodišnjim iskustvom u oblasti protetike i implantologije."}
-            </p>
-          </Link>
-        </div>
-      </Section>
-  )
+    const { doctors } = useDoctors()
+    const d = doctors[0]
+    if (!d) return null
+    return (
+        <Section className="py-16">
+            <div className="mb-10 text-center">
+                <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Vaš stomatolog</h2>
+                <p className="mt-3 text-muted-foreground">Dr Nenad Zarić – specijalista protetike</p>
+            </div>
+            <div className="mx-auto max-w-md">
+                <Link
+                    to={`/doctor/${d.id}`}
+                    className="group flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center transition-all hover:-translate-y-1 hover:shadow-lg"
+                >
+                    {d.profileImage ? (
+                        <img
+                            src={d.profileImage}
+                            alt={`Dr ${d.firstName} ${d.lastName}`}
+                            className="h-24 w-24 rounded-full object-cover"
+                        />
+                    ) : (
+                        <Avatar name={`${d.firstName} ${d.lastName}`} size={96} />
+                    )}
+                    <h3 className="mt-4 font-heading text-xl font-semibold text-foreground">
+                        Dr {d.firstName} {d.lastName}
+                    </h3>
+                    <p className="mt-1 text-sm text-primary">{d.specialization}</p>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                        {d.bio || "Stručnjak sa višegodišnjim iskustvom u oblasti protetike i implantologije."}
+                    </p>
+                </Link>
+            </div>
+        </Section>
+    )
 }
 
 function FaqItem({ item, open, onToggle }) {

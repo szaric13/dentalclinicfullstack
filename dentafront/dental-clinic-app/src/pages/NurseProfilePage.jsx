@@ -38,7 +38,15 @@ export default function NurseProfilePage() {
 
                 <Card className="p-8">
                     <div className="flex flex-col items-center text-center md:flex-row md:items-start md:text-left md:gap-6">
-                        <Avatar name={`${nurse.firstName} ${nurse.lastName}`} size={120} className="shrink-0" />
+                        {nurse.profileImage ? (
+                            <img
+                                src={nurse.profileImage}
+                                alt={`${nurse.firstName} ${nurse.lastName}`}
+                                className="h-30 w-30 rounded-full object-cover shrink-0"
+                            />
+                        ) : (
+                            <Avatar name={`${nurse.firstName} ${nurse.lastName}`} size={120} className="shrink-0" />
+                        )}
                         <div className="mt-4 md:mt-0">
                             <h1 className="font-heading text-3xl font-bold text-foreground">
                                 {nurse.firstName} {nurse.lastName}

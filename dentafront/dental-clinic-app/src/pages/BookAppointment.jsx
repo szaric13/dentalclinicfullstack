@@ -243,7 +243,15 @@ export default function BookAppointment() {
             <Modal open={!!profileDoctor} onClose={() => setProfileDoctor(null)} title={profileDoctor ? `Dr ${profileDoctor.firstName} ${profileDoctor.lastName}` : ""}>
                 {profileDoctor && (
                     <div className="space-y-3 text-center">
-                        <Avatar name={`${profileDoctor.firstName} ${profileDoctor.lastName}`} size={80} className="mx-auto" />
+                        {profileDoctor.profileImage ? (
+                            <img
+                                src={profileDoctor.profileImage}
+                                alt={`Dr ${profileDoctor.firstName} ${profileDoctor.lastName}`}
+                                className="h-20 w-20 rounded-full object-cover mx-auto"
+                            />
+                        ) : (
+                            <Avatar name={`${profileDoctor.firstName} ${profileDoctor.lastName}`} size={80} className="mx-auto" />
+                        )}
                         <p className="font-semibold text-primary">{profileDoctor.specialization}</p>
                         <p className="text-sm text-muted-foreground">{profileDoctor.bio || "Stručnjak sa višegodišnjim iskustvom."}</p>
                     </div>
