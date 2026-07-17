@@ -121,7 +121,7 @@ export default function Navbar() {
           {/* Logo – sada koristi sliku iz public/images/logonz */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
             <img
-                src="/images/logonz"
+                src="/images/logonz.png"
                 alt={CLINIC.name}
                 className="h-9 w-9 object-contain"
             />
