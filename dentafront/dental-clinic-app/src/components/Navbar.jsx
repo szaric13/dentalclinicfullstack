@@ -301,7 +301,7 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* Mobile menu – SVI NAZIVI NA SRPSKOM (hardkodirano) */}
+        {/* Mobile menu – sve na srpskom (hardkodirano) */}
         <AnimatePresence>
           {mobileOpen && (
               <motion.div
@@ -357,7 +357,7 @@ export default function Navbar() {
                           Moj profil
                         </Button>
                         <Button variant="ghost" onClick={handleLogout} className="justify-start">
-                          {t("logout")}
+                          Odjavi se
                         </Button>
                       </>
                   ) : (
@@ -367,13 +367,13 @@ export default function Navbar() {
                             onClick={() => { navigate("/login"); setMobileOpen(false) }}
                             className="justify-start"
                         >
-                          {t("login")}
+                          Prijava
                         </Button>
                         <Button
                             onClick={() => { navigate("/register"); setMobileOpen(false) }}
                             className="justify-start"
                         >
-                          {t("bookNow")}
+                          Zakaži termin
                         </Button>
                       </>
                   )}
