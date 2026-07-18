@@ -117,16 +117,13 @@ export default function Navbar() {
           )}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
+          {/* Logo – SADA KORISTI SLIKU (i na desktopu i na mobilnom) */}
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                  d="M12 2c2.5 0 4 1.5 5 1.5S19.5 3 21 4c0 5-1 9-2.5 13-.7 1.9-1.3 3-2.5 3s-1.5-2.5-2-4.5c-.4-1.6-.8-2.5-2-2.5s-1.6.9-2 2.5C9.5 17.5 9.2 20 8 20s-1.8-1.1-2.5-3C4 13 3 9 3 4c1.5-1 2.5-.5 3-1.5S9.5 2 12 2Z"
-                  fill="currentColor"
-              />
-            </svg>
-          </span>
+            <img
+                src="/images/logonz.png"
+                alt={CLINIC.name}
+                className="h-9 w-9 object-contain"
+            />
             {CLINIC.name}
           </Link>
 
