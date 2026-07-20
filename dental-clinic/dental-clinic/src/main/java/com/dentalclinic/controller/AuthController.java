@@ -30,7 +30,7 @@ public class AuthController {
     private final EmailService emailService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetTokenService passwordResetTokenService;
-    private final TwilioService smsService;
+    private final SmsService smsService; // ovo je tvoj dummy SMS (štampa u konzolu)
 
     // ==================== PATIENT REGISTER ====================
     @PostMapping("/patient/register")
@@ -244,7 +244,7 @@ public class AuthController {
         }
         Patient patient = patientService.findByEmail(email);
         PasswordResetToken token = passwordResetTokenService.createToken(patient);
-        String resetLink = "https://dentalclinicfullstack.up.railway.app/reset-password?token=" + token.getToken();
+        String resetLink = "https://dentalclinicfullstack-production.up.railway.app/reset-password?token=" + token.getToken();
         emailService.sendPasswordResetEmail(email, resetLink);
         return ResponseEntity.ok("Link za reset lozinke je poslat na email.");
     }
@@ -273,14 +273,20 @@ public class AuthController {
     @PostMapping("/patient/forgot-password-phone")
     public ResponseEntity<String> forgotPasswordByPhone(@RequestBody Map<String, String> body) {
         String phone = body.get("phone");
-        Patient patient = patientService.findByPhone(phone)
-                .orElseThrow(() -> new RuntimeException("Nalog sa tim brojem ne postoji."));
-        String code = String.format("%06d", new Random().nextInt(999999));
-        patient.setPhoneVerificationCode(code);
-        patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
-        patientService.updatePatient(patient);
-        smsService.sendSms(phone, "Vaš kod za reset lozinke: " + code);
-        return ResponseEntity.ok("Kod za reset lozinke poslat na telefon.");
+        try {
+            Patient patient = patientService.findByPhone(phone)
+                    .orElseThrow(() -> new RuntimeException("Nalog sa tim brojem ne postoji."));
+            String code = String.format("%06d", new Random().nextInt(999999));
+            // ✅ KORISTI NOVA POLJA
+            patient.setPhoneVerificationCode(code);
+            patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
+            patientService.updatePatient(patient);
+            smsService.sendSms(phone, "Vaš kod za reset lozinke: " + code);
+            return ResponseEntity.ok("Kod za reset lozinke poslat na telefon.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Greška: " + e.getMessage());
+        }
     }
 
     // ==================== RESET PASSWORD (PHONE CODE) ====================
@@ -289,17 +295,23 @@ public class AuthController {
         String phone = body.get("phone");
         String code = body.get("code");
         String newPassword = body.get("newPassword");
-        Patient patient = patientService.findByPhone(phone)
-                .orElseThrow(() -> new RuntimeException("Nalog ne postoji."));
-        if (!patient.getPhoneVerificationCode().equals(code) ||
-                patient.getPhoneVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body("Neispravan kod ili je istekao.");
+        try {
+            Patient patient = patientService.findByPhone(phone)
+                    .orElseThrow(() -> new RuntimeException("Nalog ne postoji."));
+            // ✅ KORISTI NOVA POLJA
+            if (!patient.getPhoneVerificationCode().equals(code) ||
+                    patient.getPhoneVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
+                return ResponseEntity.badRequest().body("Neispravan kod ili je istekao.");
+            }
+            patient.setPassword(passwordEncoder.encode(newPassword));
+            patient.setPhoneVerificationCode(null);
+            patient.setPhoneVerificationCodeExpiry(null);
+            patientService.updatePatient(patient);
+            return ResponseEntity.ok("Lozinka uspešno resetovana.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Greška: " + e.getMessage());
         }
-        patient.setPassword(passwordEncoder.encode(newPassword));
-        patient.setPhoneVerificationCode(null);
-        patient.setPhoneVerificationCodeExpiry(null);
-        patientService.updatePatient(patient);
-        return ResponseEntity.ok("Lozinka uspešno resetovana.");
     }
 
     // ==================== LOGOUT ====================
@@ -314,5 +326,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "Token nije pronađen ili je već opozvan."));
         }
         return ResponseEntity.ok("Odjavljeni ste.");
+    }
+
+    // ==================== (OPCIONO) ZA BACKWARD COMPATIBILITY ====================
+    @PostMapping("/patient/resend-verification")
+    public ResponseEntity<String> resendVerification(@RequestBody Map<String, String> body) {
+        String phone = body.get("phone");
+        if (phone != null && !phone.isBlank()) {
+            return resendPhoneVerification(body);
+        }
+        return ResponseEntity.badRequest().body("Potreban je broj telefona.");
     }
 }
