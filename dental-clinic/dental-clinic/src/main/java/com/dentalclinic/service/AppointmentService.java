@@ -32,13 +32,11 @@ public class AppointmentService {
     private final EmailService emailService;
     private final SmsService smsService;
 
-
     public List<LocalDateTime> getAvailableSlots(Long doctorId, Long serviceId, LocalDate date) {
         Doctor doctor = doctorService.getById(doctorId);
         DentalService service = serviceCatalogService.getById(serviceId);
         int duration = service.getDurationMinutes();
 
-        // Provera radnog vremena
         Optional<DoctorWorkingHours> optWH = workingHoursService.getWorkingHoursForDay(doctorId, date.getDayOfWeek());
         if (optWH.isEmpty()) {
             return List.of();
@@ -174,8 +172,12 @@ public class AppointmentService {
         Doctor doctor = app.getDoctor();
         String patientName = app.getPatient().getFirstName() + " " + app.getPatient().getLastName();
         if (doctor.getEmail() != null && !doctor.getEmail().isBlank()) {
-            emailService.sendCancellationNoticeToDoctor(doctor.getEmail(), doctor.getFirstName() + " " + doctor.getLastName(),
-                    patientName, app.getStartDateTime(), "Pacijent otkazao");
+            // FIXED: use sendCancellationNotice instead of sendCancellationNoticeToDoctor
+            emailService.sendCancellationNotice(doctor.getEmail(),
+                    doctor.getFirstName() + " " + doctor.getLastName(),
+                    patientName,
+                    app.getStartDateTime(),
+                    "Pacijent otkazao");
         } else if (doctor.getPhone() != null && !doctor.getPhone().isBlank()) {
             smsService.sendSms(doctor.getPhone(),
                     "Termin za pacijenta " + patientName + " (" + app.getStartDateTime() + ") je otkazan.");
@@ -203,8 +205,12 @@ public class AppointmentService {
         Patient patient = app.getPatient();
         String doctorName = app.getDoctor().getFirstName() + " " + app.getDoctor().getLastName();
         if (patient.getEmail() != null && !patient.getEmail().isBlank()) {
-            emailService.sendCancellationNoticeToDoctor(patient.getEmail(), patient.getFirstName() + " " + patient.getLastName(),
-                    doctorName, app.getStartDateTime(), reason);
+            // FIXED: use sendCancellationNotice instead of sendCancellationNoticeToDoctor
+            emailService.sendCancellationNotice(patient.getEmail(),
+                    patient.getFirstName() + " " + patient.getLastName(),
+                    doctorName,
+                    app.getStartDateTime(),
+                    reason);
         } else if (patient.getPhone() != null && !patient.getPhone().isBlank()) {
             smsService.sendSms(patient.getPhone(),
                     "Vaš termin kod dr " + doctorName + " (" + app.getStartDateTime() + ") je otkazan. Razlog: " + reason);
@@ -266,6 +272,7 @@ public class AppointmentService {
         }
         return alternatives;
     }
+
     @Scheduled(fixedRate = 3600000) // svakih sat vremena
     @Transactional
     public void autoCompletePastAppointments() {
@@ -278,6 +285,7 @@ public class AppointmentService {
             appointmentRepository.save(a);
         }
     }
+
     @Transactional
     public Appointment createManualAppointment(Long doctorId, ManualAppointmentRequest request) {
         Doctor doctor = doctorService.getById(doctorId);
@@ -290,10 +298,12 @@ public class AppointmentService {
                             .phone(request.getPatientPhone())
                             .firstName(request.getPatientFirstName())
                             .lastName(request.getPatientLastName())
-                            .email(request.getPatientPhone() + "@temp.com") // privremeni email
-                            .password(passwordEncoder.encode("temp123"))    // privremena lozinka
+                            .email(request.getPatientPhone() + "@temp.com")
+                            .password(passwordEncoder.encode("temp123"))
                             .active(true)
-                            .verified(true)
+                            // ✅ FIX: use emailVerified and phoneVerified instead of verified
+                            .emailVerified(true)
+                            .phoneVerified(true)
                             .deleted(false)
                             .build();
                     return patientRepository.save(newPatient);

@@ -14,7 +14,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     public void sendVerificationEmail(String to, String token, String firstName) {
-        String baseUrl = "https://dentalclinicfullstack.up.railway.app"; // change for prod
+        String baseUrl = "https://dentalclinicfullstack.up.railway.app";
         String verificationUrl = baseUrl + "/verify-email?token=" + token;
         String subject = "Verifikujte vaš email - Dr Zarić Ordinacija";
         String body = "Poštovani " + firstName + ",\n\n"
@@ -48,5 +48,16 @@ public class EmailService {
                 + "Datum i vreme: " + dateTime + "\n\n"
                 + "Hvala na poverenju!";
         sendSimpleMessage(to, "Termin potvrđen", body);
+    }
+
+    // ✅ ADD THIS METHOD
+    public void sendCancellationNotice(String toEmail, String recipientName,
+                                       String doctorName, LocalDateTime dateTime,
+                                       String reason) {
+        String body = "Poštovani " + recipientName + ",\n\n"
+                + "Vaš termin kod dr " + doctorName + " (" + dateTime + ") je otkazan.\n"
+                + "Razlog: " + (reason != null ? reason : "nije naveden") + "\n\n"
+                + "Za više informacija, kontaktirajte ordinaciju.";
+        sendSimpleMessage(toEmail, "Termin otkazan", body);
     }
 }
