@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class PatientService {
 
     private final PatientRepository patientRepository;
@@ -35,11 +36,16 @@ public class PatientService {
         return patientRepository.existsByPhone(phone);
     }
 
+    public boolean existsByEmail(String email) {
+        return patientRepository.existsByEmail(email);
+    }
+
     @Transactional
     public Patient registerPatient(String phone, String rawPassword, String firstName,
                                    String lastName, String email, LocalDate dateOfBirth, String notes) {
         if (existsByPhone(phone)) {
-            Patient existing = patientRepository.findByPhone(phone).get();
+            Patient existing = patientRepository.findByPhone(phone)
+                    .orElseThrow(() -> new RuntimeException("Nalog postoji ali nije pronađen."));
             if (!existing.getPhoneVerified() || !existing.getEmailVerified()) {
                 throw new RuntimeException("Nalog postoji ali nije verifikovan. Zatražite novi kod.");
             } else {
@@ -73,13 +79,19 @@ public class PatientService {
 
         patient = patientRepository.save(patient);
 
-        // Send email verification
+        // 🔇 PRIVREMENO – samo štampamo u konzolu
+        System.out.println("===== VERIFICATION DATA =====");
+        System.out.println("Email token: " + verificationToken);
+        System.out.println("Phone code: " + phoneCode);
+        System.out.println("==============================");
+
+        // Komentariši ove linije dok ne podesiš SMTP i Twilio:
+        /*
         if (email != null && !email.isBlank()) {
             emailService.sendVerificationEmail(email, verificationToken, firstName);
         }
-
-        // Send SMS verification
         twilioService.sendSms(phone, "Vaš verifikacioni kod za Dr Zarić Ordinaciju je: " + phoneCode);
+        */
 
         return patient;
     }
@@ -95,7 +107,6 @@ public class PatientService {
             patient.setPhoneVerified(true);
             patient.setPhoneVerificationCode(null);
             patient.setPhoneVerificationCodeExpiry(null);
-            // Activate only if email is also verified? We'll allow partial, but login requires both.
             if (patient.getEmailVerified()) {
                 patient.setActive(true);
             }
@@ -130,7 +141,9 @@ public class PatientService {
         patient.setPhoneVerificationCode(newCode);
         patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
         patientRepository.save(patient);
-        twilioService.sendSms(phone, "Vaš novi verifikacioni kod: " + newCode);
+        // 🔇 PRIVREMENO štampamo
+        System.out.println("New phone code: " + newCode);
+        // twilioService.sendSms(phone, "Vaš novi verifikacioni kod: " + newCode);
     }
 
     @Transactional
@@ -143,7 +156,8 @@ public class PatientService {
         String newToken = UUID.randomUUID().toString();
         patient.setVerificationToken(newToken);
         patientRepository.save(patient);
-        emailService.sendVerificationEmail(email, newToken, patient.getFirstName());
+        System.out.println("New email token: " + newToken);
+        // emailService.sendVerificationEmail(email, newToken, patient.getFirstName());
     }
 
     public Patient findByEmail(String email) {
@@ -153,9 +167,5 @@ public class PatientService {
 
     public Patient updatePatient(Patient patient) {
         return patientRepository.save(patient);
-    }
-
-    public boolean existsByEmail(String email) {
-        return patientRepository.existsByEmail(email);
     }
 }
