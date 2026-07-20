@@ -45,7 +45,7 @@ public class AuthController {
                     request.getDateOfBirth(),
                     request.getNotes()
             );
-            return ResponseEntity.ok("Registracija uspešna. Proverite email i SMS za verifikaciju.");
+            return ResponseEntity.ok("Registracija uspešna. Proverite SMS za verifikacioni kod.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -67,17 +67,6 @@ public class AuthController {
         }
     }
 
-    // ==================== PATIENT VERIFY EMAIL ====================
-    @GetMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
-        boolean verified = patientService.verifyEmail(token);
-        if (verified) {
-            return ResponseEntity.ok("Email uspešno verifikovan! Možete se prijaviti.");
-        } else {
-            return ResponseEntity.badRequest().body("Nevažeći token.");
-        }
-    }
-
     // ==================== RESEND PHONE CODE ====================
     @PostMapping("/patient/resend-phone")
     public ResponseEntity<String> resendPhoneVerification(@RequestBody Map<String, String> body) {
@@ -88,21 +77,6 @@ public class AuthController {
         try {
             patientService.resendPhoneVerificationCode(phone);
             return ResponseEntity.ok("Novi verifikacioni kod je poslat na telefon.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // ==================== RESEND EMAIL ====================
-    @PostMapping("/patient/resend-email")
-    public ResponseEntity<String> resendEmailVerification(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body("Email je obavezan.");
-        }
-        try {
-            patientService.resendEmailVerification(email);
-            return ResponseEntity.ok("Verifikacioni email je ponovo poslat.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -119,8 +93,9 @@ public class AuthController {
                 throw new RuntimeException("Pogrešan telefon ili lozinka");
             }
 
-            if (!patient.getEmailVerified() || !patient.getPhoneVerified()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Nalog nije u potpunosti verifikovan."));
+            // ✅ Only check phone verification – email is completely ignored
+            if (!patient.getPhoneVerified()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Telefon nije verifikovan."));
             }
 
             if (!patient.getActive()) {
@@ -264,8 +239,8 @@ public class AuthController {
         }
         Patient patient = token.getPatient();
         patient.setPassword(passwordEncoder.encode(newPassword));
-        patient.setEmailVerified(true);   // ✅ OZNAČI EMAIL KAO VERIFIKOVAN
-        patient.setActive(true);          // ✅ AKTIVIRAJ NALOG
+        patient.setEmailVerified(true);   // optional – not used, but harmless
+        patient.setActive(true);
         patientService.updatePatient(patient);
         passwordResetTokenService.useToken(token);
         return ResponseEntity.ok("Lozinka uspešno resetovana. Sada možete da se prijavite.");
@@ -306,8 +281,8 @@ public class AuthController {
             patient.setPassword(passwordEncoder.encode(newPassword));
             patient.setPhoneVerificationCode(null);
             patient.setPhoneVerificationCodeExpiry(null);
-            patient.setPhoneVerified(true);   // ✅ OZNAČI TELEFON KAO VERIFIKOVAN
-            patient.setActive(true);          // ✅ AKTIVIRAJ NALOG
+            patient.setPhoneVerified(true);
+            patient.setActive(true);
             patientService.updatePatient(patient);
             return ResponseEntity.ok("Lozinka uspešno resetovana. Sada možete da se prijavite.");
         } catch (Exception e) {
@@ -330,7 +305,7 @@ public class AuthController {
         return ResponseEntity.ok("Odjavljeni ste.");
     }
 
-    // ==================== (OPCIONO) ZA BACKWARD COMPATIBILITY ====================
+    // ==================== BACKWARD COMPATIBILITY ====================
     @PostMapping("/patient/resend-verification")
     public ResponseEntity<String> resendVerification(@RequestBody Map<String, String> body) {
         String phone = body.get("phone");

@@ -11,17 +11,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
-    private final TwilioService twilioService;
 
     public Optional<Patient> findByPhone(String phone) {
         return patientRepository.findByPhone(phone);
@@ -36,17 +32,14 @@ public class PatientService {
         return patientRepository.existsByPhone(phone);
     }
 
-    public boolean existsByEmail(String email) {
-        return patientRepository.existsByEmail(email);
-    }
-
     @Transactional
     public Patient registerPatient(String phone, String rawPassword, String firstName,
                                    String lastName, String email, LocalDate dateOfBirth, String notes) {
+
         if (existsByPhone(phone)) {
             Patient existing = patientRepository.findByPhone(phone)
                     .orElseThrow(() -> new RuntimeException("Nalog postoji ali nije pronađen."));
-            if (!existing.getPhoneVerified() || !existing.getEmailVerified()) {
+            if (!existing.getPhoneVerified()) {
                 throw new RuntimeException("Nalog postoji ali nije verifikovan. Zatražite novi kod.");
             } else {
                 throw new RuntimeException("Broj telefona već postoji. Prijavite se.");
@@ -57,7 +50,6 @@ public class PatientService {
             throw new RuntimeException("Email već postoji.");
         }
 
-        String verificationToken = UUID.randomUUID().toString();
         String phoneCode = String.format("%06d", new Random().nextInt(999999));
 
         Patient patient = Patient.builder()
@@ -70,28 +62,19 @@ public class PatientService {
                 .notes(notes)
                 .active(false)
                 .deleted(false)
-                .emailVerified(false)
+                .emailVerified(true)   // ✅ automatically verified, we don't use email verification
                 .phoneVerified(false)
-                .verificationToken(verificationToken)
+                .verificationToken(null) // not used
                 .phoneVerificationCode(phoneCode)
                 .phoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(10))
                 .build();
 
         patient = patientRepository.save(patient);
 
-        // 🔇 PRIVREMENO – samo štampamo u konzolu
-        System.out.println("===== VERIFICATION DATA =====");
-        System.out.println("Email token: " + verificationToken);
-        System.out.println("Phone code: " + phoneCode);
-        System.out.println("==============================");
-
-        // Komentariši ove linije dok ne podesiš SMTP i Twilio:
-        /*
-        if (email != null && !email.isBlank()) {
-            emailService.sendVerificationEmail(email, verificationToken, firstName);
-        }
-        twilioService.sendSms(phone, "Vaš verifikacioni kod za Dr Zarić Ordinaciju je: " + phoneCode);
-        */
+        // Print code to logs (since no real SMS yet)
+        System.out.println("===== VERIFICATION CODE =====");
+        System.out.println("Phone: " + phone + "  Code: " + phoneCode);
+        System.out.println("=============================");
 
         return patient;
     }
@@ -107,27 +90,11 @@ public class PatientService {
             patient.setPhoneVerified(true);
             patient.setPhoneVerificationCode(null);
             patient.setPhoneVerificationCodeExpiry(null);
-            if (patient.getEmailVerified()) {
-                patient.setActive(true);
-            }
+            patient.setActive(true);
             patientRepository.save(patient);
             return true;
         }
         return false;
-    }
-
-    @Transactional
-    public boolean verifyEmail(String token) {
-        Optional<Patient> optPatient = patientRepository.findByVerificationToken(token);
-        if (optPatient.isEmpty()) return false;
-        Patient patient = optPatient.get();
-        patient.setEmailVerified(true);
-        patient.setVerificationToken(null);
-        if (patient.getPhoneVerified()) {
-            patient.setActive(true);
-        }
-        patientRepository.save(patient);
-        return true;
     }
 
     @Transactional
@@ -141,23 +108,7 @@ public class PatientService {
         patient.setPhoneVerificationCode(newCode);
         patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
         patientRepository.save(patient);
-        // 🔇 PRIVREMENO štampamo
-        System.out.println("New phone code: " + newCode);
-        // twilioService.sendSms(phone, "Vaš novi verifikacioni kod: " + newCode);
-    }
-
-    @Transactional
-    public void resendEmailVerification(String email) {
-        Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Nalog sa tim email‑om ne postoji."));
-        if (patient.getEmailVerified()) {
-            throw new RuntimeException("Email je već verifikovan.");
-        }
-        String newToken = UUID.randomUUID().toString();
-        patient.setVerificationToken(newToken);
-        patientRepository.save(patient);
-        System.out.println("New email token: " + newToken);
-        // emailService.sendVerificationEmail(email, newToken, patient.getFirstName());
+        System.out.println("New phone code for " + phone + ": " + newCode);
     }
 
     public Patient findByEmail(String email) {

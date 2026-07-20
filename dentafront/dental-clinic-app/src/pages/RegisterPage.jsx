@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Eye, EyeOff, ShieldCheck, ArrowLeft } from "lucide-react"
+import { Eye, EyeOff, ArrowLeft, ShieldCheck } from "lucide-react"
 import toast from "react-hot-toast"
 import PageWrapper from "../components/PageWrapper"
 import AuthLayout from "../components/AuthLayout"
@@ -48,7 +48,8 @@ export default function RegisterPage() {
       if (!payload.dateOfBirth) delete payload.dateOfBirth
       if (!payload.notes) delete payload.notes
       await authApi.patientRegister(payload)
-      toast.success("Registracija uspešna! Proverite email i SMS za verifikaciju.")
+      toast.success("Registracija uspešna! Proverite SMS za verifikacioni kod.")
+      // Redirect to phone verification with phone pre-filled
       navigate("/verify-phone", { state: { phone: form.phone } })
     } catch (err) {
       toast.error(apiError(err, "Registracija nije uspela"))
@@ -57,9 +58,8 @@ export default function RegisterPage() {
     }
   }
 
-  // Legacy verify step – we keep it for backward compatibility, but we will now redirect to verify-phone page
-  // We can remove this step entirely or keep as fallback
-  // For simplicity, we'll keep it but we already navigate away
+  // Legacy verify step – we keep it as fallback but we now redirect to /verify-phone
+  // We can keep it if you want, but it's redundant.
   const onVerify = async (e) => {
     e.preventDefault()
     if (!code.trim()) return toast.error("Unesite kod iz SMS poruke")
@@ -87,6 +87,7 @@ export default function RegisterPage() {
     }
   }
 
+  // Show verify step if we're in that mode (kept for backward compatibility)
   if (step === "verify") {
     return (
         <PageWrapper title="Verifikacija">
