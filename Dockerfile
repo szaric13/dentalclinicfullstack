@@ -13,7 +13,7 @@ WORKDIR /app
 COPY dental-clinic/dental-clinic/pom.xml .
 COPY dental-clinic/dental-clinic/src ./src
 COPY --from=frontend-build /frontend/dist/ ./src/main/resources/static/
-RUN mvn clean package -DskipTests
+RUN mvn clean package -Dmaven.test.skip=true
 
 # ---------- Runtime ----------
 FROM eclipse-temurin:21-jre
