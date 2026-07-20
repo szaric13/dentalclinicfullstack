@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, Link } from "react-router-dom"
-import { api } from "../lib/api"
+import api from "../lib/api"   // ✅ default import
 import PageWrapper from "../components/PageWrapper"
 import { Button, Card } from "../components/ui"
 
