@@ -48,8 +48,8 @@ export default function RegisterPage() {
       if (!payload.dateOfBirth) delete payload.dateOfBirth
       if (!payload.notes) delete payload.notes
       await authApi.patientRegister(payload)
-      toast.success("Poslali smo vam SMS kod za verifikaciju")
-      setStep("verify")
+      toast.success("Registracija uspešna! Proverite email i SMS za verifikaciju.")
+      navigate("/verify-phone", { state: { phone: form.phone } })
     } catch (err) {
       toast.error(apiError(err, "Registracija nije uspela"))
     } finally {
@@ -57,6 +57,9 @@ export default function RegisterPage() {
     }
   }
 
+  // Legacy verify step – we keep it for backward compatibility, but we will now redirect to verify-phone page
+  // We can remove this step entirely or keep as fallback
+  // For simplicity, we'll keep it but we already navigate away
   const onVerify = async (e) => {
     e.preventDefault()
     if (!code.trim()) return toast.error("Unesite kod iz SMS poruke")
@@ -86,103 +89,103 @@ export default function RegisterPage() {
 
   if (step === "verify") {
     return (
-      <PageWrapper title="Verifikacija">
-        <AuthLayout
-          title="Potvrdite broj telefona"
-          subtitle={`Unesite šestocifreni kod koji smo poslali na ${form.phone}.`}
-        >
-          <form onSubmit={onVerify} className="space-y-5">
-            <div className="flex items-center justify-center">
+        <PageWrapper title="Verifikacija">
+          <AuthLayout
+              title="Potvrdite broj telefona"
+              subtitle={`Unesite šestocifreni kod koji smo poslali na ${form.phone}.`}
+          >
+            <form onSubmit={onVerify} className="space-y-5">
+              <div className="flex items-center justify-center">
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <ShieldCheck size={28} />
               </span>
-            </div>
-            <Input
-              id="code"
-              label="Verifikacioni kod"
-              placeholder="123456"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              inputMode="numeric"
-              maxLength={6}
-              className="text-center text-lg tracking-[0.5em]"
-            />
-            <Button type="submit" className="w-full" loading={loading} size="lg">
-              Potvrdi
-            </Button>
-            <div className="flex items-center justify-between text-sm">
-              <button
-                type="button"
-                onClick={() => setStep("form")}
-                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft size={15} /> Nazad
-              </button>
-              <button
-                type="button"
-                onClick={onResend}
-                disabled={resending}
-                className="font-semibold text-primary hover:underline disabled:opacity-60"
-              >
-                {resending ? "Slanje…" : "Pošalji ponovo"}
-              </button>
-            </div>
-          </form>
-        </AuthLayout>
-      </PageWrapper>
+              </div>
+              <Input
+                  id="code"
+                  label="Verifikacioni kod"
+                  placeholder="123456"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  inputMode="numeric"
+                  maxLength={6}
+                  className="text-center text-lg tracking-[0.5em]"
+              />
+              <Button type="submit" className="w-full" loading={loading} size="lg">
+                Potvrdi
+              </Button>
+              <div className="flex items-center justify-between text-sm">
+                <button
+                    type="button"
+                    onClick={() => setStep("form")}
+                    className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft size={15} /> Nazad
+                </button>
+                <button
+                    type="button"
+                    onClick={onResend}
+                    disabled={resending}
+                    className="font-semibold text-primary hover:underline disabled:opacity-60"
+                >
+                  {resending ? "Slanje…" : "Pošalji ponovo"}
+                </button>
+              </div>
+            </form>
+          </AuthLayout>
+        </PageWrapper>
     )
   }
 
   return (
-    <PageWrapper title="Registracija">
-      <AuthLayout
-        title="Kreirajte nalog"
-        subtitle="Registrujte se da biste zakazivali termine online."
-        footer={
-          <>
-            Već imate nalog?{" "}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
-              Prijavite se
-            </Link>
-          </>
-        }
-      >
-        <form onSubmit={onSubmitForm} className="space-y-4" noValidate>
-          <div className="grid grid-cols-2 gap-3">
-            <Input id="firstName" name="firstName" label="Ime" value={form.firstName} onChange={onChange} error={errors.firstName} />
-            <Input id="lastName" name="lastName" label="Prezime" value={form.lastName} onChange={onChange} error={errors.lastName} />
-          </div>
-          <Input id="phone" name="phone" label="Broj telefona" placeholder="0641234567" value={form.phone} onChange={onChange} error={errors.phone} autoComplete="tel" />
-          <Input id="email" name="email" type="email" label="Email adresa" placeholder="vi@email.com" value={form.email} onChange={onChange} error={errors.email} autoComplete="email" />
-          <Input id="dateOfBirth" name="dateOfBirth" type="date" label="Datum rođenja (opciono)" value={form.dateOfBirth} onChange={onChange} />
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPw ? "text" : "password"}
-              label="Lozinka"
-              placeholder="Najmanje 6 karaktera"
-              value={form.password}
-              onChange={onChange}
-              error={errors.password}
-              className="pr-10"
-              autoComplete="new-password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPw((s) => !s)}
-              className="absolute right-3.5 top-[2.45rem] text-muted-foreground hover:text-foreground"
-              aria-label={showPw ? "Sakrij lozinku" : "Prikaži lozinku"}
-            >
-              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-          <Textarea id="notes" name="notes" label="Napomena (opciono)" placeholder="Alergije, posebni zahtevi…" value={form.notes} onChange={onChange} />
-          <Button type="submit" className="w-full" loading={loading} size="lg">
-            Registruj se
-          </Button>
-        </form>
-      </AuthLayout>
-    </PageWrapper>
+      <PageWrapper title="Registracija">
+        <AuthLayout
+            title="Kreirajte nalog"
+            subtitle="Registrujte se da biste zakazivali termine online."
+            footer={
+              <>
+                Već imate nalog?{" "}
+                <Link to="/login" className="font-semibold text-primary hover:underline">
+                  Prijavite se
+                </Link>
+              </>
+            }
+        >
+          <form onSubmit={onSubmitForm} className="space-y-4" noValidate>
+            <div className="grid grid-cols-2 gap-3">
+              <Input id="firstName" name="firstName" label="Ime" value={form.firstName} onChange={onChange} error={errors.firstName} />
+              <Input id="lastName" name="lastName" label="Prezime" value={form.lastName} onChange={onChange} error={errors.lastName} />
+            </div>
+            <Input id="phone" name="phone" label="Broj telefona" placeholder="0641234567" value={form.phone} onChange={onChange} error={errors.phone} autoComplete="tel" />
+            <Input id="email" name="email" type="email" label="Email adresa" placeholder="vi@email.com" value={form.email} onChange={onChange} error={errors.email} autoComplete="email" />
+            <Input id="dateOfBirth" name="dateOfBirth" type="date" label="Datum rođenja (opciono)" value={form.dateOfBirth} onChange={onChange} />
+            <div className="relative">
+              <Input
+                  id="password"
+                  name="password"
+                  type={showPw ? "text" : "password"}
+                  label="Lozinka"
+                  placeholder="Najmanje 6 karaktera"
+                  value={form.password}
+                  onChange={onChange}
+                  error={errors.password}
+                  className="pr-10"
+                  autoComplete="new-password"
+              />
+              <button
+                  type="button"
+                  onClick={() => setShowPw((s) => !s)}
+                  className="absolute right-3.5 top-[2.45rem] text-muted-foreground hover:text-foreground"
+                  aria-label={showPw ? "Sakrij lozinku" : "Prikaži lozinku"}
+              >
+                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <Textarea id="notes" name="notes" label="Napomena (opciono)" placeholder="Alergije, posebni zahtevi…" value={form.notes} onChange={onChange} />
+            <Button type="submit" className="w-full" loading={loading} size="lg">
+              Registruj se
+            </Button>
+          </form>
+        </AuthLayout>
+      </PageWrapper>
   )
 }

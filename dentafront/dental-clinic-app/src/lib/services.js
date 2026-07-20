@@ -14,9 +14,12 @@ export const publicApi = {
 // ---------- AUTH ----------
 export const authApi = {
   patientRegister: (payload) => api.post("/auth/patient/register", payload).then((r) => r.data),
-  patientVerify: (payload) => api.post("/auth/patient/verify", payload).then((r) => r.data),
+  patientVerify: (payload) => api.post("/auth/patient/verify", payload).then((r) => r.data), // legacy, keep for compatibility
+  patientVerifyPhone: (payload) => api.post("/auth/patient/verify-phone", payload).then((r) => r.data),
   patientLogin: (payload) => api.post("/auth/patient/login", payload).then((r) => r.data),
-  patientResend: (phone) => api.post("/auth/patient/resend-verification", { phone }).then((r) => r.data),
+  patientResend: (phone) => api.post("/auth/patient/resend-verification", { phone }).then((r) => r.data), // legacy
+  patientResendPhone: (phone) => api.post("/auth/patient/resend-phone", { phone }).then((r) => r.data),
+  patientResendEmail: (email) => api.post("/auth/patient/resend-email", { email }).then((r) => r.data),
   patientForgotEmail: (email) => api.post("/auth/patient/forgot-password", { email }).then((r) => r.data),
   patientResetEmail: (payload) => api.post("/auth/patient/reset-password", payload).then((r) => r.data),
   patientForgotPhone: (phone) => api.post("/auth/patient/forgot-password-phone", { phone }).then((r) => r.data),
@@ -24,7 +27,7 @@ export const authApi = {
   doctorLogin: (payload) => api.post("/auth/doctor/login", payload).then((r) => r.data),
   logout: () => {
     const refreshToken = storage.refreshToken
-    return api.post( "/auth/logout", { refreshToken }).catch(() => {})
+    return api.post("/auth/logout", { refreshToken }).catch(() => {})
   },
 }
 

@@ -30,8 +30,9 @@ public class AuthController {
     private final EmailService emailService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetTokenService passwordResetTokenService;
-    private final SmsService smsService;
+    private final TwilioService smsService;
 
+    // ==================== PATIENT REGISTER ====================
     @PostMapping("/patient/register")
     public ResponseEntity<String> registerPatient(@Valid @RequestBody PatientRegisterRequest request) {
         try {
@@ -44,22 +45,70 @@ public class AuthController {
                     request.getDateOfBirth(),
                     request.getNotes()
             );
-            return ResponseEntity.ok("Registracija uspešna. Proverite SMS za verifikacioni kod.");
+            return ResponseEntity.ok("Registracija uspešna. Proverite email i SMS za verifikaciju.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PostMapping("/patient/verify")
-    public ResponseEntity<String> verifyPatientPhone(@Valid @RequestBody PatientVerifyRequest request) {
-        boolean verified = patientService.verifyPhone(request.getPhone(), request.getCode());
+    // ==================== PATIENT VERIFY PHONE ====================
+    @PostMapping("/patient/verify-phone")
+    public ResponseEntity<String> verifyPhone(@RequestBody Map<String, String> body) {
+        String phone = body.get("phone");
+        String code = body.get("code");
+        if (phone == null || code == null) {
+            return ResponseEntity.badRequest().body("Telefon i kod su obavezni.");
+        }
+        boolean verified = patientService.verifyPhone(phone, code);
         if (verified) {
-            return ResponseEntity.ok("Telefon uspešno verifikovan. Možete se prijaviti.");
+            return ResponseEntity.ok("Telefon uspešno verifikovan.");
         } else {
-            return ResponseEntity.badRequest().body("Neispravan kod ili je istekao.");
+            return ResponseEntity.badRequest().body("Neispravan ili istekao kod.");
         }
     }
 
+    // ==================== PATIENT VERIFY EMAIL ====================
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        boolean verified = patientService.verifyEmail(token);
+        if (verified) {
+            return ResponseEntity.ok("Email uspešno verifikovan! Možete se prijaviti.");
+        } else {
+            return ResponseEntity.badRequest().body("Nevažeći token.");
+        }
+    }
+
+    // ==================== RESEND PHONE CODE ====================
+    @PostMapping("/patient/resend-phone")
+    public ResponseEntity<String> resendPhoneVerification(@RequestBody Map<String, String> body) {
+        String phone = body.get("phone");
+        if (phone == null || phone.isBlank()) {
+            return ResponseEntity.badRequest().body("Broj telefona je obavezan.");
+        }
+        try {
+            patientService.resendPhoneVerificationCode(phone);
+            return ResponseEntity.ok("Novi verifikacioni kod je poslat na telefon.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ==================== RESEND EMAIL ====================
+    @PostMapping("/patient/resend-email")
+    public ResponseEntity<String> resendEmailVerification(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body("Email je obavezan.");
+        }
+        try {
+            patientService.resendEmailVerification(email);
+            return ResponseEntity.ok("Verifikacioni email je ponovo poslat.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ==================== PATIENT LOGIN ====================
     @PostMapping("/patient/login")
     public ResponseEntity<Map<String, String>> loginPatient(@Valid @RequestBody PatientLoginRequest request) {
         try {
@@ -70,8 +119,13 @@ public class AuthController {
                 throw new RuntimeException("Pogrešan telefon ili lozinka");
             }
 
-            if (!patient.getActive() || !patient.getVerified()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Nalog nije aktivan ili nije verifikovan"));
+            if (!patient.getEmailVerified() || !patient.getPhoneVerified()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Nalog nije u potpunosti verifikovan."));
+            }
+
+            if (!patient.getActive()) {
+                patient.setActive(true);
+                patientService.updatePatient(patient);
             }
 
             String accessToken = jwtUtil.generateAccessToken(patient.getId(), "PATIENT", patient.getPhone());
@@ -87,6 +141,7 @@ public class AuthController {
         }
     }
 
+    // ==================== PATIENT REFRESH ====================
     @PostMapping("/patient/refresh")
     public ResponseEntity<?> refreshPatientToken(@RequestBody Map<String, String> body) {
         try {
@@ -121,6 +176,7 @@ public class AuthController {
         }
     }
 
+    // ==================== DOCTOR LOGIN ====================
     @PostMapping("/doctor/login")
     public ResponseEntity<Map<String, String>> loginDoctor(@Valid @RequestBody DoctorLoginRequest request) {
         try {
@@ -148,6 +204,7 @@ public class AuthController {
         }
     }
 
+    // ==================== DOCTOR REFRESH ====================
     @PostMapping("/doctor/refresh")
     public ResponseEntity<Map<String, String>> refreshDoctorToken(@RequestBody Map<String, String> body) {
         String refreshTokenStr = body.get("refreshToken");
@@ -177,33 +234,22 @@ public class AuthController {
         tokens.put("refreshToken", newRefreshToken.getToken());
         return ResponseEntity.ok(tokens);
     }
-    @PostMapping("/patient/resend-verification")
-    public ResponseEntity<String> resendVerification(@RequestBody Map<String, String> body) {
-        String phone = body.get("phone");
-        if (phone == null || phone.isBlank()) {
-            return ResponseEntity.badRequest().body("Broj telefona je obavezan.");
-        }
-        try {
-            patientService.resendVerificationCode(phone);
-            return ResponseEntity.ok("Novi verifikacioni kod je poslat.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+
+    // ==================== FORGOT PASSWORD (EMAIL) ====================
     @PostMapping("/patient/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         if (email == null || email.isBlank()) {
             return ResponseEntity.badRequest().body("Email je obavezan.");
         }
-        Patient patient = patientService.findByEmail(email);  // koristimo servis, a ne repozitorijum
+        Patient patient = patientService.findByEmail(email);
         PasswordResetToken token = passwordResetTokenService.createToken(patient);
-        String resetLink = "http://localhost:3000/reset-password?token=" + token.getToken();
+        String resetLink = "https://dentalclinicfullstack.up.railway.app/reset-password?token=" + token.getToken();
         emailService.sendPasswordResetEmail(email, resetLink);
         return ResponseEntity.ok("Link za reset lozinke je poslat na email.");
     }
 
-
+    // ==================== RESET PASSWORD (EMAIL TOKEN) ====================
     @PostMapping("/patient/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body) {
         String tokenStr = body.get("token");
@@ -218,23 +264,26 @@ public class AuthController {
         }
         Patient patient = token.getPatient();
         patient.setPassword(passwordEncoder.encode(newPassword));
-        patientService.updatePatient(patient);   // <-- ISPRAVLJENO (više ne koristimo patientRepository)
+        patientService.updatePatient(patient);
         passwordResetTokenService.useToken(token);
         return ResponseEntity.ok("Lozinka uspešno resetovana.");
     }
+
+    // ==================== FORGOT PASSWORD (PHONE) ====================
     @PostMapping("/patient/forgot-password-phone")
     public ResponseEntity<String> forgotPasswordByPhone(@RequestBody Map<String, String> body) {
         String phone = body.get("phone");
         Patient patient = patientService.findByPhone(phone)
                 .orElseThrow(() -> new RuntimeException("Nalog sa tim brojem ne postoji."));
         String code = String.format("%06d", new Random().nextInt(999999));
-        patient.setVerificationCode(code);
-        patient.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
+        patient.setPhoneVerificationCode(code);
+        patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
         patientService.updatePatient(patient);
         smsService.sendSms(phone, "Vaš kod za reset lozinke: " + code);
         return ResponseEntity.ok("Kod za reset lozinke poslat na telefon.");
     }
 
+    // ==================== RESET PASSWORD (PHONE CODE) ====================
     @PostMapping("/patient/reset-password-phone")
     public ResponseEntity<String> resetPasswordByPhone(@RequestBody Map<String, String> body) {
         String phone = body.get("phone");
@@ -242,16 +291,18 @@ public class AuthController {
         String newPassword = body.get("newPassword");
         Patient patient = patientService.findByPhone(phone)
                 .orElseThrow(() -> new RuntimeException("Nalog ne postoji."));
-        if (!patient.getVerificationCode().equals(code) ||
-                patient.getVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
+        if (!patient.getPhoneVerificationCode().equals(code) ||
+                patient.getPhoneVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Neispravan kod ili je istekao.");
         }
         patient.setPassword(passwordEncoder.encode(newPassword));
-        patient.setVerificationCode(null);
-        patient.setVerificationCodeExpiry(null);
+        patient.setPhoneVerificationCode(null);
+        patient.setPhoneVerificationCodeExpiry(null);
         patientService.updatePatient(patient);
         return ResponseEntity.ok("Lozinka uspešno resetovana.");
     }
+
+    // ==================== LOGOUT ====================
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
         String refreshTokenStr = body.get("refreshToken");

@@ -27,6 +27,10 @@ import NotFoundPage from "./pages/NotFoundPage.jsx"
 import NursesPage from "./pages/NursePage.jsx"
 import NurseProfilePage from "./pages/NurseProfilePage.jsx"
 
+// New verification pages
+import VerifyEmail from "./pages/VerifyEmail.jsx"
+import VerifyPhone from "./pages/VerifyPhone.jsx"
+
 export default function App() {
     const location = useLocation()
 
@@ -53,6 +57,8 @@ export default function App() {
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/doctor/:id" element={<DoctorProfilePage />} />
                         <Route path="/profile/:slug" element={<ProfilePage />} />
+                        <Route path="/verify-email" element={<VerifyEmail />} />
+                        <Route path="/verify-phone" element={<VerifyPhone />} />
 
                         <Route
                             path="/patient/dashboard"

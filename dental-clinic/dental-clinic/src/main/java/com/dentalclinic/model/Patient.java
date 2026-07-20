@@ -2,15 +2,13 @@ package com.dentalclinic.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "patients")
 @Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class Patient {
 
     @Id
@@ -32,7 +30,6 @@ public class Patient {
     @Column(nullable = false, unique = true)
     private String email;
 
-
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
@@ -45,14 +42,22 @@ public class Patient {
     @Column(nullable = false)
     private Boolean deleted = false;
 
-    @Column(nullable = false)
-    private Boolean verified = false;
+    // Email verification
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
 
-    @Column(name = "verification_code", length = 10)
-    private String verificationCode;
+    @Column(name = "verification_token")
+    private String verificationToken;          // for email link
 
-    @Column(name = "verification_code_expiry")
-    private LocalDateTime verificationCodeExpiry;
+    // Phone verification
+    @Column(name = "phone_verified")
+    private Boolean phoneVerified = false;
+
+    @Column(name = "phone_verification_code")
+    private String phoneVerificationCode;
+
+    @Column(name = "phone_verification_code_expiry")
+    private LocalDateTime phoneVerificationCodeExpiry;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
