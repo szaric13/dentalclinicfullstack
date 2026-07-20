@@ -137,12 +137,16 @@ public class AppointmentService {
 
         appointment = appointmentRepository.save(appointment);
 
+        // 🔇 ISKLJUČENO – samo štampa u konzolu
         String patientMessage = "Vaš termin je zakazan i čeka potvrdu doktora.";
+        System.out.println("NOTIFICATION (simulacija): " + patientMessage + " za pacijenta " + patient.getPhone());
+        /*
         if (patient.getEmail() != null && !patient.getEmail().isBlank()) {
             emailService.sendSimpleMessage(patient.getEmail(), "Termin na čekanju", patientMessage);
         } else if (patient.getPhone() != null && !patient.getPhone().isBlank()) {
             smsService.sendSms(patient.getPhone(), patientMessage);
         }
+        */
 
         return appointment;
     }
@@ -169,10 +173,12 @@ public class AppointmentService {
         app.setStatus(Appointment.AppointmentStatus.CANCELLED);
         appointmentRepository.save(app);
 
+        // 🔇 ISKLJUČENO
+        System.out.println("NOTIFICATION: Pacijent otkazao termin za doktora " + app.getDoctor().getFirstName());
+        /*
         Doctor doctor = app.getDoctor();
         String patientName = app.getPatient().getFirstName() + " " + app.getPatient().getLastName();
         if (doctor.getEmail() != null && !doctor.getEmail().isBlank()) {
-            // FIXED: use sendCancellationNotice instead of sendCancellationNoticeToDoctor
             emailService.sendCancellationNotice(doctor.getEmail(),
                     doctor.getFirstName() + " " + doctor.getLastName(),
                     patientName,
@@ -182,6 +188,7 @@ public class AppointmentService {
             smsService.sendSms(doctor.getPhone(),
                     "Termin za pacijenta " + patientName + " (" + app.getStartDateTime() + ") je otkazan.");
         }
+        */
     }
 
     @Transactional
@@ -202,10 +209,12 @@ public class AppointmentService {
         app.setCancellationReason(reason);
         appointmentRepository.save(app);
 
+        // 🔇 ISKLJUČENO
+        System.out.println("NOTIFICATION: Doktor otkazao termin pacijentu " + app.getPatient().getFirstName());
+        /*
         Patient patient = app.getPatient();
         String doctorName = app.getDoctor().getFirstName() + " " + app.getDoctor().getLastName();
         if (patient.getEmail() != null && !patient.getEmail().isBlank()) {
-            // FIXED: use sendCancellationNotice instead of sendCancellationNoticeToDoctor
             emailService.sendCancellationNotice(patient.getEmail(),
                     patient.getFirstName() + " " + patient.getLastName(),
                     doctorName,
@@ -215,6 +224,7 @@ public class AppointmentService {
             smsService.sendSms(patient.getPhone(),
                     "Vaš termin kod dr " + doctorName + " (" + app.getStartDateTime() + ") je otkazan. Razlog: " + reason);
         }
+        */
     }
 
     @Transactional(readOnly = true)
@@ -242,6 +252,9 @@ public class AppointmentService {
         app.setStatus(Appointment.AppointmentStatus.CONFIRMED);
         appointmentRepository.save(app);
 
+        // 🔇 ISKLJUČENO
+        System.out.println("NOTIFICATION: Termin potvrđen za pacijenta " + app.getPatient().getFirstName());
+        /*
         Patient patient = app.getPatient();
         String doctorName = app.getDoctor().getFirstName() + " " + app.getDoctor().getLastName();
         String message = "Vaš termin kod dr " + doctorName + " (" + app.getStartDateTime() + ") je potvrđen.";
@@ -250,6 +263,7 @@ public class AppointmentService {
         } else if (patient.getPhone() != null && !patient.getPhone().isBlank()) {
             smsService.sendSms(patient.getPhone(), message);
         }
+        */
     }
 
     public Appointment getAppointmentById(Long id) {
@@ -291,7 +305,6 @@ public class AppointmentService {
         Doctor doctor = doctorService.getById(doctorId);
         DentalService service = serviceCatalogService.getById(request.getServiceId());
 
-        // Pronađi ili kreiraj pacijenta
         Patient patient = patientService.findByPhone(request.getPatientPhone())
                 .orElseGet(() -> {
                     Patient newPatient = Patient.builder()
@@ -301,7 +314,6 @@ public class AppointmentService {
                             .email(request.getPatientPhone() + "@temp.com")
                             .password(passwordEncoder.encode("temp123"))
                             .active(true)
-                            // ✅ FIX: use emailVerified and phoneVerified instead of verified
                             .emailVerified(true)
                             .phoneVerified(true)
                             .deleted(false)
@@ -309,7 +321,6 @@ public class AppointmentService {
                     return patientRepository.save(newPatient);
                 });
 
-        // Provera specijalizacije
         if (doctor.getSpecialization() == null || service.getSpecialization() == null) {
             throw new RuntimeException("Doktor ili usluga nemaju definisanu specijalizaciju.");
         }
@@ -325,14 +336,12 @@ public class AppointmentService {
             throw new RuntimeException("Doktor nema odgovarajuću specijalizaciju za ovu uslugu.");
         }
 
-        // Provera dostupnosti slota
         LocalDate date = request.getStartDateTime().toLocalDate();
         List<LocalDateTime> freeSlots = getAvailableSlots(doctorId, request.getServiceId(), date);
         if (!freeSlots.contains(request.getStartDateTime())) {
             throw new RuntimeException("Odabrani termin je zauzet ili nije dostupan.");
         }
 
-        // Kreiraj termin sa statusom CONFIRMED (jer je doktor lično zakazao)
         Appointment appointment = Appointment.builder()
                 .patient(patient)
                 .doctor(doctor)
@@ -345,13 +354,16 @@ public class AppointmentService {
 
         appointment = appointmentRepository.save(appointment);
 
-        // Notifikacija pacijentu
+        // 🔇 ISKLJUČENO
         String message = "Vaš termin kod dr " + doctor.getFirstName() + " " + doctor.getLastName() +
                 " je zakazan za " + appointment.getStartDateTime() + ".";
+        System.out.println("NOTIFICATION (manual): " + message + " za pacijenta " + patient.getPhone());
+        /*
         if (patient.getEmail() != null && !patient.getEmail().isBlank()) {
             emailService.sendSimpleMessage(patient.getEmail(), "Termin zakazan", message);
         }
         smsService.sendSms(patient.getPhone(), message);
+        */
 
         return appointment;
     }
