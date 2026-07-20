@@ -30,7 +30,7 @@ public class AuthController {
     private final EmailService emailService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetTokenService passwordResetTokenService;
-    private final SmsService smsService; // ovo je tvoj dummy SMS (štampa u konzolu)
+    private final SmsService smsService;
 
     // ==================== PATIENT REGISTER ====================
     @PostMapping("/patient/register")
@@ -264,9 +264,11 @@ public class AuthController {
         }
         Patient patient = token.getPatient();
         patient.setPassword(passwordEncoder.encode(newPassword));
+        patient.setEmailVerified(true);   // ✅ OZNAČI EMAIL KAO VERIFIKOVAN
+        patient.setActive(true);          // ✅ AKTIVIRAJ NALOG
         patientService.updatePatient(patient);
         passwordResetTokenService.useToken(token);
-        return ResponseEntity.ok("Lozinka uspešno resetovana.");
+        return ResponseEntity.ok("Lozinka uspešno resetovana. Sada možete da se prijavite.");
     }
 
     // ==================== FORGOT PASSWORD (PHONE) ====================
@@ -277,7 +279,6 @@ public class AuthController {
             Patient patient = patientService.findByPhone(phone)
                     .orElseThrow(() -> new RuntimeException("Nalog sa tim brojem ne postoji."));
             String code = String.format("%06d", new Random().nextInt(999999));
-            // ✅ KORISTI NOVA POLJA
             patient.setPhoneVerificationCode(code);
             patient.setPhoneVerificationCodeExpiry(LocalDateTime.now().plusMinutes(5));
             patientService.updatePatient(patient);
@@ -298,7 +299,6 @@ public class AuthController {
         try {
             Patient patient = patientService.findByPhone(phone)
                     .orElseThrow(() -> new RuntimeException("Nalog ne postoji."));
-            // ✅ KORISTI NOVA POLJA
             if (!patient.getPhoneVerificationCode().equals(code) ||
                     patient.getPhoneVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
                 return ResponseEntity.badRequest().body("Neispravan kod ili je istekao.");
@@ -306,8 +306,10 @@ public class AuthController {
             patient.setPassword(passwordEncoder.encode(newPassword));
             patient.setPhoneVerificationCode(null);
             patient.setPhoneVerificationCodeExpiry(null);
+            patient.setPhoneVerified(true);   // ✅ OZNAČI TELEFON KAO VERIFIKOVAN
+            patient.setActive(true);          // ✅ AKTIVIRAJ NALOG
             patientService.updatePatient(patient);
-            return ResponseEntity.ok("Lozinka uspešno resetovana.");
+            return ResponseEntity.ok("Lozinka uspešno resetovana. Sada možete da se prijavite.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Greška: " + e.getMessage());
